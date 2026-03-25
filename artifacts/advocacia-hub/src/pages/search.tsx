@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Layout } from "@/components/layout";
 import { LawyerCard } from "@/components/lawyer-card";
 import { SearchBar } from "@/components/search-bar";
+import { AdBanner, SidebarAdStack } from "@/components/ad-banner";
 import { useLawyerSearch } from "@/hooks/use-lawyers";
 import { useListSpecialties } from "@/hooks/use-specialties";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -128,17 +129,22 @@ export default function SearchPage() {
         </div>
       </div>
 
+      <AdBanner position="header" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col md:flex-row gap-8">
           
           {/* Desktop Sidebar */}
-          <aside className="hidden md:block w-64 shrink-0">
+          <aside className="hidden md:flex flex-col gap-5 w-64 shrink-0">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 sticky top-28">
               <div className="flex items-center gap-2 mb-6">
                 <Filter className="w-5 h-5 text-primary" />
                 <h2 className="font-bold text-lg">Filtros</h2>
               </div>
               <FilterSidebar />
+            </div>
+            <div className="sticky top-[calc(28px+var(--filter-height,400px)+20px)]">
+              <SidebarAdStack />
             </div>
           </aside>
 

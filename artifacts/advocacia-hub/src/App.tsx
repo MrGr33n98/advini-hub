@@ -4,12 +4,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
-// Pages
 import Home from "@/pages/home";
 import SearchPage from "@/pages/search";
 import LawyerProfile from "@/pages/lawyer-profile";
 import BlogList from "@/pages/blog-list";
 import BlogPostPage from "@/pages/blog-post";
+import CategoriasPage from "@/pages/categorias";
+import LoginPage from "@/pages/login";
+import CadastroPage from "@/pages/cadastro";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,8 +29,11 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/buscar" component={SearchPage} />
       <Route path="/advogado/:id" component={LawyerProfile} />
+      <Route path="/categorias" component={CategoriasPage} />
       <Route path="/blog" component={BlogList} />
       <Route path="/blog/:id" component={BlogPostPage} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/cadastro" component={CadastroPage} />
       <Route component={NotFound} />
     </Switch>
   );
