@@ -1,0 +1,22 @@
+packages:
+  "framer-motion": "For fluid, premium page transitions and interactive micro-animations."
+  "date-fns": "For formatting dates in blog posts and reviews."
+  "@hookform/resolvers": "For zod schema validation on contact and review forms."
+
+images:
+  - path: "artifacts/advocacia-hub/public/images/hero-bg.png"
+    description: "Abstract architectural background with subtle curves, deep institutional blue and soft teal lighting, professional, clean, slightly frosted glass effect"
+    aspect_ratio: "16:9"
+  - path: "artifacts/advocacia-hub/public/images/pattern-dots.png"
+    description: "Subtle geometric dot pattern in light gray, very minimalist and clean, used for background texture"
+    aspect_ratio: "1:1"
+  - path: "artifacts/advocacia-hub/public/images/banner-generic.png"
+    description: "Elegant legal scale and gavel abstract 3D composition, soft claymorphism style, deep blue and gold accents"
+    aspect_ratio: "16:9"
+  - path: "artifacts/advocacia-hub/public/images/lawyer-placeholder-1.png"
+    description: "Professional headshot placeholder of a confident lawyer in a suit, soft studio lighting, soft gray background"
+    aspect_ratio: "1:1"
+
+notes:
+  - "The UI relies on standard React Query hooks generated from the OpenAPI spec, imported directly via @workspace/api-client-react."
+  - "Uses claymorphism design trends: soft fluffy shadows, pillowy cards, deep professional colors."

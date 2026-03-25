@@ -1,22 +1,32 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AdvocaciaHub API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: lawyers
+    description: Lawyer operations
+  - name: offices
+    description: Law office operations
+  - name: specialties
+    description: Specialty operations
+  - name: reviews
+    description: Review operations
+  - name: blog
+    description: Blog post operations
+  - name: banners
+    description: Banner operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +34,236 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /lawyers:
+    get:
+      operationId: listLawyers
+      tags: [lawyers]
+      summary: List lawyers with filters
+      parameters:
+        - name: specialty
+          in: query
+          schema:
+            type: string
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: minRating
+          in: query
+          schema:
+            type: number
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 12
+      responses:
+        "200":
+          description: List of lawyers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LawyerListResponse"
+
+  /lawyers/{id}:
+    get:
+      operationId: getLawyer
+      tags: [lawyers]
+      summary: Get lawyer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lawyer details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LawyerDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /specialties:
+    get:
+      operationId: listSpecialties
+      tags: [specialties]
+      summary: List all specialties
+      responses:
+        "200":
+          description: List of specialties
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Specialty"
+
+  /reviews:
+    post:
+      operationId: createReview
+      tags: [reviews]
+      summary: Submit a review for a lawyer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewInput"
+      responses:
+        "201":
+          description: Review submitted for moderation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reviews/lawyer/{lawyerId}:
+    get:
+      operationId: getReviewsByLawyer
+      tags: [reviews]
+      summary: Get approved reviews for a lawyer
+      parameters:
+        - name: lawyerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of approved reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+
+  /blog:
+    get:
+      operationId: listBlogPosts
+      tags: [blog]
+      summary: List published blog posts
+      parameters:
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 9
+      responses:
+        "200":
+          description: Blog posts list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPostListResponse"
+
+  /blog/{id}:
+    get:
+      operationId: getBlogPost
+      tags: [blog]
+      summary: Get a blog post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Blog post detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlogPostDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /banners:
+    get:
+      operationId: listBanners
+      tags: [banners]
+      summary: List active banners by position
+      parameters:
+        - name: position
+          in: query
+          schema:
+            type: string
+            enum: [header, sidebar, blog-between]
+      responses:
+        "200":
+          description: Active banners
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Banner"
+
+  /contact:
+    post:
+      operationId: sendContactMessage
+      tags: [lawyers]
+      summary: Send contact message to a lawyer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactMessageInput"
+      responses:
+        "200":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +271,284 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    Specialty:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        parentId:
+          type: integer
+          nullable: true
+        slug:
+          type: string
+      required: [id, name, slug]
+
+    LawyerSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        oabNumber:
+          type: string
+        oabState:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        bio:
+          type: string
+        yearsExperience:
+          type: integer
+        hourlyRateMin:
+          type: number
+          nullable: true
+        hourlyRateMax:
+          type: number
+          nullable: true
+        isVerified:
+          type: boolean
+        avgRating:
+          type: number
+        totalReviews:
+          type: integer
+        photoUrl:
+          type: string
+          nullable: true
+        specialties:
+          type: array
+          items:
+            $ref: "#/components/schemas/Specialty"
+      required:
+        - id
+        - fullName
+        - oabNumber
+        - oabState
+        - city
+        - state
+        - bio
+        - yearsExperience
+        - isVerified
+        - avgRating
+        - totalReviews
+        - specialties
+
+    LawyerDetail:
+      allOf:
+        - $ref: "#/components/schemas/LawyerSummary"
+        - type: object
+          properties:
+            phone:
+              type: string
+              nullable: true
+            website:
+              type: string
+              nullable: true
+            languages:
+              type: array
+              items:
+                type: string
+            office:
+              $ref: "#/components/schemas/OfficeSummary"
+              nullable: true
+            recentReviews:
+              type: array
+              items:
+                $ref: "#/components/schemas/Review"
+          required: [languages, recentReviews]
+
+    OfficeSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        tradeName:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        lawyerCount:
+          type: integer
+        logoUrl:
+          type: string
+          nullable: true
+      required: [id, tradeName, city, state, lawyerCount]
+
+    LawyerListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/LawyerSummary"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        totalPages:
+          type: integer
+      required: [data, total, page, limit, totalPages]
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        lawyerId:
+          type: integer
+        rating:
+          type: integer
+        comment:
+          type: string
+        caseType:
+          type: string
+        caseOutcome:
+          type: string
+          nullable: true
+        moderationStatus:
+          type: string
+          enum: [pending, approved, rejected]
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, lawyerId, rating, comment, caseType, moderationStatus, createdAt]
+
+    CreateReviewInput:
+      type: object
+      properties:
+        lawyerId:
+          type: integer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          minLength: 20
+        caseType:
+          type: string
+          enum: [trabalhista, civil, criminal, familia, tributario, empresarial, consumidor, previdenciario, outro]
+        caseOutcome:
+          type: string
+          enum: [vencido, perdido, acordo, em_andamento]
+          nullable: true
+        clientName:
+          type: string
+      required: [lawyerId, rating, comment, caseType, clientName]
+
+    BlogPost:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        excerpt:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        publishedAt:
+          type: string
+          format: date-time
+        featuredImageUrl:
+          type: string
+          nullable: true
+        authorName:
+          type: string
+        authorOab:
+          type: string
+        readTimeMinutes:
+          type: integer
+      required: [id, title, excerpt, tags, publishedAt, authorName, authorOab, readTimeMinutes]
+
+    BlogPostDetail:
+      allOf:
+        - $ref: "#/components/schemas/BlogPost"
+        - type: object
+          properties:
+            content:
+              type: string
+          required: [content]
+
+    BlogPostListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlogPost"
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
+      required: [data, total, page, totalPages]
+
+    Banner:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        imageUrl:
+          type: string
+        targetUrl:
+          type: string
+        position:
+          type: string
+          enum: [header, sidebar, blog-between]
+        isActive:
+          type: boolean
+      required: [id, title, imageUrl, targetUrl, position, isActive]
+
+    ContactMessageInput:
+      type: object
+      properties:
+        lawyerId:
+          type: integer
+        clientName:
+          type: string
+        clientEmail:
+          type: string
+          format: email
+        clientPhone:
+          type: string
+          nullable: true
+        message:
+          type: string
+        caseType:
+          type: string
+      required: [lawyerId, clientName, clientEmail, message, caseType]

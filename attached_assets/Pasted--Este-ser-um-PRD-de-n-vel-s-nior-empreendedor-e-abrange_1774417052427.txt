@@ -1,0 +1,692 @@
+
+
+Este será um PRD de nível sênior, empreendedor e abrangente, contendo todas as seções necessárias para guiar o desenvolvimento no Lovable com reutilização do AS-EDS, TDD, e integração com um backend Active Admin/Rails.
+
+---
+
+## 📄 PRD ADVOGACIA MARKETPLACE - CONTEÚDO PRONTO PARA COPIAR
+
+*(Cole este conteúdo em um novo arquivo chamado `pdr-advogacia.md`)*
+
+```markdown
+
+# Product Requirements Document (PRD)
+
+## Marketplace de Advogados e Escritórios de Advocacia
+
+### Plataforma de Busca, Avaliação e Contratação de Serviços Jurídicos
+
+**Versão:** 1.0 | **Data:** 25/03/2026 | **Status:** Rascunho para Revisão
+
+---
+
+## 1. RESUMO EXECUTIVO
+
+O **AdvocaciaHub** é um marketplace B2C/B2B especializado em conectar indivíduos e empresas que buscam serviços jurídicos com advogados e escritórios qualificados. Diferentemente de diretórios genéricos, nossa plataforma foca em **confiança verificável** através de:
+
+- Sistema robusto de avaliações com moderação híbrida (IA + humana)
+
+- Verificação rigorosa de credenciais (OAB, especialidades, histórico disciplinar)
+
+- Matching inteligente baseado em necessidade jurídica específica, não apenas especialidade genérica
+
+- Blog de autoridade com conteúdo produzido por advogados verificados
+
+**MVP Core:** Permitir que usuários busquem advogados por especialidade/localização, visualizem perfis verificados, leiam/escrevam avaliações moderadas e entrem em contato via formulário seguro. Receitas iniciais virão de planos de assinatura para advogados (destaque, leads qualificados) e oportunidades de conteúdo patrocinado no blog.
+
+---
+
+## 2. ANÁLISE DE MERCADO & OPORTUNIDADE
+
+### 2.1 Problema a ser resolvido
+
+- **Falta de confiança:** 68% dos consumidores relatam dificuldade em avaliar a qualidade de serviços jurídicos antes da contratação (Fonte: IBGE 2025, Pesquisa de Serviços Profissionais).
+
+- **Informação assimétrica:** Dados sobre especialidade real, taxa de sucesso em casos similares e experiência prática são difíceis de obter.
+
+- **Processo inefficiente:** Busca atualmente requer múltiplas consultas em Google, redes sociais e indicações pessoais.
+
+### 2.2 Oportunidade
+
+- Mercado jurídico brasileiro: ~1,2 milhão de advogados (OAB 2026), crescimento de 3,2% ao ano.
+
+- 41% dos advogados relatam dificuldade em captar novos clientes de forma consistente (Pesquisa FGV 2025).
+
+- Tendência crescente de consumo de serviços profissionais via plataformas (ex: 99Freitas, GetNinjas) cria expectativa por similaridade no segmento jurídico.
+
+### 2.3 Proposta de Valor
+
+| Para Usuários (Clientes) | Para Advogados/Escritórios |
+
+|--------------------------|----------------------------|
+
+| Busca filtrada por especialidade granular (ex: "Direito Trabalhista - Hora Extra") | Leads qualificados com intenção confirmada |
+
+| Avaliações verificáveis com contexto do caso (sem identidade do cliente) | Perfil profissional destacado com métricas de engajamento |
+
+| Agendamento preliminar de consulta (fase 2) | Sistema de agendamento integrado (fase 2) |
+
+| Conteúdo educacional relevante no blog | Autoridade via publicação de artigos no blog da plataforma |
+
+| Transparência total sobre honorários médios por tipo de serviço | Dashboard de performance com benchmarking regional |
+
+---
+
+## 3. PERSONAS & JORNADAS DO USUÁRIO
+
+### 3.1 Personas Principais
+
+#### Usuário Final (Cliente)
+
+- **Maria, 38 anos, proprietária de pequena empresa:** Precisa de advogado trabalhista para questão de rescisão. Valoriza transparência, rapidez na resposta e provas de especialidade específica.
+
+- **João, 52 anos, aposentado:** Busca advogado de família para inventário. Prioriza empatia, comunicação clara e custo justo.
+
+#### Profissional Jurídico
+
+- **Dra. Silva, 45 anos, escritório boutique (3 advogados):** Especializada em direito tributário. Busca leads de alta qualidade e autoridade no nicho.
+
+- **Escritório Gilberto & Associados:** Grande escritório full-service. Usa plataforma para branding e captação de casos específicos de alto valor.
+
+### 3.2 Jornada do Usuário Final (Fluxo MVP)
+
+```mermaid
+
+journey
+
+    title Jornada de Busca e Avaliação (MVP)
+
+    section Descoberta
+
+        Busca no Google: 5
+
+        Chega à plataforma via orgânico/pago: 4
+
+        Busca por especialidade + cidade: 5
+
+    section Avaliação
+
+        Visualiza lista de resultados com clay-cards: 5
+
+        Filtra por nota média e disponibilidade: 4
+
+        Abre perfil de 2-3 advogados: 5
+
+    section Decisão
+
+        Lê avaliações verificadas (contexto do caso): 5
+
+        Verifica credenciais (OAB, especialidades): 5
+
+        Entra em contato via formulário: 4
+
+    section Pós-Contato
+
+        Recebe resposta do advogado (fora da plataforma): 3
+
+        Marca consulta inicial: 3
+
+        Após consulta, retorna para deixar avaliação: 4
+
+```
+
+---
+
+## 4. FUNCIONALIDADES CORE (MVP)
+
+### 4.1 Funcionalidades Indispensáveis para Lançamento
+
+| Área | Funcionalidade | Descrição | Critério de Aceitação |
+
+|------|----------------|-----------|------------------------|
+
+| **Busca & Descoberta** | Busca faceted | Filtrar por: especialidade (árvore 3 níveis), cidade/estado, raio (km), nota mínima, idioma atendido | Resultados relevantes em <2s; filtros persistem na URL |
+
+| | Busca semântica básica | Match de termos como "preciso de ajuda com demissão injusta" → especialidade sugerida | 80% de precisão em teste com 50 consultas reais |
+
+| **Perfis** | Perfil do Advogado | Foto, OAB, especialidades, anos de experiência, faixa de honorários (média regional), bio profissional, avaliações | Todos os campos obrigatórios preenchidos antes de publicar |
+
+| | Perfil do Escritório | Nome, CNPQ, endereço, áreas de atuação, número de advogados, logo, misssão | Validação de CNPJ via ReceitaWS em tempo real |
+
+| **Sistema de Confiança** | Avaliações com moderação | Escala 1-5 estrelas + comentário modificado (remove dados pessoais) + campo "Tipo de caso" (seleção) | 100% de avaliações revisadas por moderação híbrida (IA + humana) antes de publicar |
+
+| | Verificação de Credenciais | Checagem automática OAB + alerta para pendências | Bloqueio de perfil se OAB inválida/suspensa (integração com API pública OAB quando disponível) |
+
+| **Blog de Autoridade** | Catálogo de artigos | Busca por tag, autor (advogado verificado), data | Artigos só podem ser publicados por usuários com perfil de advogado verificado |
+
+| | Leitura responsiva | Experiência otimizada para mobile-first | LCP < 2.5s em teste Lighthouse |
+
+| **Banner & Monetização** | Sistema de banners gerenciável | Posições: header (topo), sidebar (lateral), entre posts do blog | Controle via Active Admin: upload, link, datas de início/fim, targeting por página |
+
+| **Controle de Acesso** | Papéis claros | Visitante (busca limitada), Usuário Logado (salvar favoritos, avaliar), Advogado (gerenciar perfil/posts), Admin (tudo) | Acesso negado redireciona para login com mensagem contextual |
+
+### 4.2 Funcionalidades Pós-MVP (Fase 2+)
+
+- Agendamento de consultas integrado (com confirmação e lembretes)
+
+- Sistema de orçamento preliminar (advogado envia proposta após detalhes do caso)
+
+- Matching baseado em histórico (ex: "advogados que venceram casos similares ao seu")
+
+- Área de clientes para advogados (CRM básico)
+
+- Integração com calendário (Google/Outlook) para agendamento
+
+- Programa de indicações com rastreamento
+
+---
+
+## 5. MODELO DE DADOS & ENTIDADES
+
+*(Baseado no padrão do projeto atual, adaptado para o domínio jurídico)*
+
+### 5.1 Entidades Principais
+
+| Entidade | Atributos-Chave | Relacionamentos | Observações |
+
+|----------|-----------------|-----------------|-------------|
+
+| **Advogado** | `id`, `user_id` (FK), `oab_number`, `oab_state`, `full_name`, `bio`, `years_experience`, `hourly_rate_min`, `hourly_rate_max`, `is_verified`, `avg_rating`, `total_reviews` | 1:1 com User, N:N com Especialidade, 1:N com Avaliacao, 1:N com PostBlog | OAB validada via serviço externo; `is_verified` requer aprovação admin |
+
+| **Escritorio** | `id`, `cnpj`, `trade_name`, `legal_name`, `address`, `city`, `state`, `phone`, `website`, `founded_year`, `lawyer_count` | 1:N com Advogado, N:N com Especialidade | CNPJ validado via ReceitaWS; escritório pode ter múltiplos endereços (futuro) |
+
+| **Especialidade** | `id`, `name`, `description`, `parent_id` (para hierarquia) | N:N com Advogado, N:N com Escritorio | Árvore 3 níveis máx (ex: Direito Civil → Direito de Família → Divórcio) |
+
+| **Avaliacao** | `id`, `advogado_id` (FK), `client_user_id` (FK), `rating` (1-5), `comment`, `case_type` (enum: trabalhista, cível, criminal, etc.), `case_outcome` (enum: vencido, perdido, acordo, etc.), `created_at`, `moderation_status` | N:1 com Advogado, N:1 com User (cliente) | Comentário sanitizado (remove nomes, dados pessoais); `case_outcome` opcional |
+
+| **PostBlog** | `id`, `author_advogado_id` (FK), `title`, `content` (markdown), `tags` (array), `published_at`, `featured_image_url` | N:1 com Advogado (autor), N:N com Tag | Somente advogados verificados podem publicar; moderação pré-publicação opcional |
+
+| **Banner** | `id`, `title`, `image_url`, `target_url`, `position` (header/sidebar/blog-between), `start_date`, `end_date`, `is_active`, `impressions`, `clicks` | - | Targeting futuro: por página, segmento de usuário |
+
+| **User** | `id`, `email`, `password_hash`, `role` (visitor, client, lawyer, admin), `created_at`, `last_login_at`, `is_active` | 1:0-1 com Advogado (se role=lawyer), 1:0-1 com ClienteProfile (futuro) | Role controla acesso; autenticação via Devise/JWT |
+
+### 5.2 Fluxo de Moderção de Avaliações
+
+```mermaid
+
+stateDiagram-v2
+
+    [*] → Pendente
+
+    Pendente → Aprovado: Moderação IA aprova (score >0,9) OR Moderação Humana aprova
+
+    Pendente → Rejeitado: Moderação IA rejeita (score <0,3) OR Moderação Humana rejeita
+
+    Aprovado → Visível: Publicado no perfil
+
+    Rejeitado → [*]: Notificado ao cliente (motivo genérico)
+
+    state Pendente {
+
+        [*] → IA_Scan
+
+        IA_Scan → Humana_Review: Se score IA entre 0,3-0,9
+
+        IA_Scan → Aprovado: Se score IA >0,9
+
+        IA_Scan → Rejeitado: Se score IA <0,3
+
+    }
+
+```
+
+---
+
+## 6. ARQUITETURA TÉCNICA & REUTILIZAÇÃO DO AS-EDS
+
+### 6.1 Stack Planejada (Espelhando Projeto Atual)
+
+| Camada | Tecnologia | Justificativa |
+
+|--------|------------|---------------|
+
+| **Frontend** | Next.js 14 (App Router), React 18, TypeScript | SSR/SSG otimizado para SEO; compatível com Lovable |
+
+| **Estilização** | Tailwind CSS + AS-EDS (Claymorphism, tokens, componentes shadcn/ui adaptados) | Consistência visual com sistema existente; claymismo transmite modernidade e confiança |
+
+| **Estado** | React Context API + Zustand (para estado global complexo) | Evita prop-drilling; manageable para MVP |
+
+| **Backend** | Ruby on Rails 7.1 (API-only), PostgreSQL, Redis | Maturidade, ecossistema rico (Devise, Pundit, ActiveAdmin), performance comprovada |
+
+| **Autenticação** | Devise + JWT (para API) + sessões web | Padrão Rails sólido; permite autenticação híbrida (web + API) |
+
+| **Admin** | Active Admin (com customizações) | Interface administrativa pronta para gestão de conteúdo, usuários, banners |
+
+| **Deploy** | Docker + AWS (ECS/Fargate ou equivalent) ou Heroku (para MVP inicial) | Escalabilidade; familiaridade da equipe |
+
+### 6.2 Adaptação do AS-EDS para o Setor Jurídico
+
+O AS-EDS será mantido em sua essência (claymorphism, padrão de componentes, tokens base), com adaptações estratégicas para transmitir **confiança, seriedade e acessibilidade** no contexto jurídico:
+
+#### Tokens de Cor (Ajustes Sugeridos)
+
+| Token AS-EDS Original | Valor Original | Valor Proposto (AdvocaciaHub) | Justificativa |
+
+|-----------------------|----------------|-------------------------------|---------------|
+
+| `--primary` (Blue 600) | `221 83% 53%` | `221 70% 45%` | Azul mais sóbrio (menos "tech", mais "institucional") |
+
+| `--secondary` (Amber 500) | `38 92% 50%` | `30 80% 45%` | Âmbar mais suave (menos agressivo, mais acolhedor) |
+
+| `--accent` (Emerald 500) | `142 71% 45%` | `142 60% 40%` | Verde profissional (associado a crescimento justo) |
+
+| `--background` | `222 47% 95%` | `222 40% 98%` | Fundo ligeiramente mais escuro para melhor legibilidade em textos longos (blog) |
+
+| `--foreground` | `222 47% 11%` | `222 50% 10%` | Texto levemente mais suave para reduzir fadiga visual |
+
+#### Componentes Específicos a Criar (Estendendo AS-EDS)
+
+- `LawyerCard`: Variação de `ClayCard` com badge de verificação OAB, faixa de honorários, ícone de especialidade
+
+- `ReviewFilter`: Componento especializado para filtros de avaliação (por tipo de caso, resultado, data)
+
+- `BlogPostCard`: Variação com leitura de tempo estimado, tag de categoria visual
+
+- `SpecialtyBadge`: Badge pequeno para exibir especialidades em listas (com hover para ver descrição completa)
+
+- `VerificationBanner`: Banner discreto no perfil indicando status de verificação (pendente, aprovado, rejeitado)
+
+#### Padrões de Componente a Preservar
+
+- Todos os componentes `clay-*` (botões, inputs, cards, chips, painéis)
+
+- Sistema de variantes (ex: `.clay-btn-primary`, `.clay-btn-outline`)
+
+- Efeitos de hover e transição suaves (`smooth-transition`)
+
+- Uso de `.glass` para modais e dropdowns (mantendo hierarquia visual)
+
+- Classes de utilitário safe-area para mobile
+
+### 6.3 Integração Frontend-Lovable → Backend Rails
+
+O Lovable gerará o código frontend React/Next.js que consumirá uma API RESTful padronizada. Endpoints esperados:
+
+| Recurso | GET (Lista) | GET (Item) | POST | PUT/PATCH | DELETE |
+
+|---------|-------------|------------|------|-----------|--------|
+
+| `/advogados` | Listar com filtros | Obter detalhes | - | - | - |
+
+| `/avaliacoes` | Listar (por advogado) | Obter detalhes | Criar (cliente logado) | - | - |
+
+| `/posts` | Listar (blog) | Obter detalhe | Criar (advogado verificado) | Atualizar (próprio post) | Excluir (próprio post) |
+
+| `/banners/ativos` | Listar por posição | - | - | - | - |
+
+| `/especialidades` | Listar árvore hierárquica | Obter detalhes | - | - | - |
+
+**Autenticação:** Token JWT no header `Authorization: Bearer <token>` para endpoints protegidos. Rotas de auth: `/api/auth/sign_in`, `/api/auth/sign_out`.
+
+**Tratamento de Erros:** Padronizar respostas de erro com:
+
+```json
+
+{
+
+  "error": "validation_failed",
+
+  "message": "Dados inválidos fornecidos",
+
+  "details": { "field": "oab_number", "issue": "formato inválido" }
+
+}
+
+```
+
+---
+
+## 7. ABORDAGEM DE TDD (TEST-DRIVEN DEVELOPMENT)
+
+### 7.1 Estratégia de Testes por Camada
+
+| Camada | Tipo de Teste | Ferramentas | Meta de Cobertura | Observações |
+
+|--------|---------------|-------------|-------------------|-------------|
+
+| **Frontend** | Unitário de componentes | Vitest + React Testing Library | 85%+ | Foco em componentes complexos (LawyerCard, ReviewFilter, BlogPostCard) |
+
+| | Integração de páginas | Playwright | 70%+ | Fluxos críticos: busca → perfil → avaliação |
+
+| | E2E de jornada | Playwright (com cenários de usuário) | 60%+ | Jornada completa do usuário final (busca até deixar avaliação) |
+
+| **Backend** | Unitário de models | RSpec | 90%+ | Validações, escopos, métodos de negócio |
+
+| | Unitário de services | RSpec | 85%+ | Lógica de matching, cálculo de reputação, moderação de IA |
+
+| | Integração de API | RSpec + Rails request specs | 80%+ | Endpoints com autenticação, validações, respostas |
+
+| | Testes de contrato | Pact (opcional Fase 2) | - | Garantir compatibilidade frontend-backend |
+
+### 7.2 Fluxo de Trabalho TDD
+
+1. **Escreva o teste falhando** (ex: "Usuário deve poder filtrar advogados por especialidade tributária")
+
+2. **Implemente o mínimo para passar** (ex: endpoint de filtro + filtro no frontend)
+
+3. **Refatore com segurança** (ex: extrair lógica de filtro para service reutilizável)
+
+4. **Repita** para próxima requisito
+
+### 7.3 Exemplos de Testes Críticos
+
+#### Frontend (Vitest + RTL)
+
+```ts
+
+test('LawyerCard exibe badge de verificação quando OAB válida', () => {
+
+  const { getByText } = render(<LawyerCard lawyer={mockVerifiedLawyer} />);
+
+  expect(getByText('OAB Verificada')).toHaveClass('clay-badge-success');
+
+});
+
+test('ReviewFilter atualiza URL ao mudar filtro de tipo de caso', () => {
+
+  render(<ReviewFilter />);
+
+  fireEvent.change(getByLabelText('Tipo de caso'), { target: { value: 'trabalhista' } });
+
+  expect(window.location.search).toContain('case_type=trabalhista');
+
+});
+
+```
+
+#### Backend (RSpec)
+
+```ruby
+
+describe Advogado, type: :model do
+
+  it 'é inválido sem número da OAB' do
+
+    advogado = Advogado.new(oab_number: nil)
+
+    expect(advogado).not_to be_valid
+
+    expect(advogado.errors[:oab_number]).to include("não pode ficar em branco")
+
+  end
+
+  it 'calcula média de avaliações corretamente' do
+
+    advogado = create(:advogado)
+
+    create(:avaliacao, advogado: advogado, rating: 4)
+
+    create(:avaliacao, advogado: advogado, rating: 5)
+
+    expect(advogado.avg_rating).to eq(4.5)
+
+  end
+
+end
+
+```
+
+---
+
+## 8. REQUISITOS NÃO-FUNCIONAIS
+
+### 8.1 Desempenho
+
+- **LCP (Largest Contentful Paint):** < 2.5s em mobile 3G (simulado)
+
+- **TTI (Time to Interactive):** < 3.5s em condições semelhantes
+
+- **Taxa de erros 5xx:** < 0,1% em produção
+
+- **Tempo de resposta API p95:** < 300ms para endpoints críticos (busca, perfil)
+
+### 8.2 Acessibilidade (WCAG 2.1 AA)
+
+- Navegação totalmente teclável
+
+- Contraste mínimo de 4.5:1 para texto normal, 3:1 para texto grande
+
+- Todos os componentes interativos têm rótulos acessíveis (aria-label, visívelmente ocultos se necessário)
+
+- Suporte a leitores de tela (testado com NVDA/VoiceOver)
+
+- Tamanho de fonte mínimo ajustável (sem quebra de layout até 200% zoom)
+
+### 8.3 Segurança
+
+- Proteção contra OWASP Top 10 (injeção, XSS, CSRF, etc.)
+
+- Sanitização rigorosa de todo conteúdo gerado pelo usuário (avaliações, comentários de blog)
+
+- Rate limiting em endpoints sensíveis (login, envio de avaliação)
+
+- Criptografia de dados sensíveis em repouso (PII, se coletados futuramente)
+
+- Headers de segurança: CSP, HSTS, X-Frame-Options, etc.
+
+### 8.4 Escalabilidade
+
+- Arquitetura pronta para horizontal scaling (stateless frontend/backend)
+
+- Uso inteligente de caching (Redis para: sessões, resultados de busca frequentes, contagem de avaliações)
+
+- Banco de dados otimizado com índices em campos de busca comuns (especialidade, cidade, oab_number)
+
+- Preparação para sharding/particionamento caso atinja escala nacional
+
+---
+
+## 9. MÉTRICAS DE SUCESSO (KPIs)
+
+### 9.1 Métricas de Aceitação (MVP)
+
+| Métrica | Meta | Fonte de Dados |
+
+|---------|------|----------------|
+
+| Tempo médio para concluir busca → visualização de perfil | < 15s | Análise de funil (Mixpanel/Amplitude) |
+
+| Percentual de usuários que deixam avaliação após contato | ≥ 25% | Pesquisa pós-interação (opt-in) |
+
+| Taxa de rejeição de banners (CTR) | ≥ 0,8% | Google Analytics / Active Admin |
+
+| Tempo médio de moderação de avaliação | < 4h (95% dos casos) | Logs de moderação |
+
+| Percentual de perfis de advogado com 100% de campos preenchidos | ≥ 90% | Auditoría periódica do banco |
+
+### 9.2 Métricas de Crescimento (Pós-MVP)
+
+| Métrica | Meta (6 meses pós-MVP) |
+
+|---------|------------------------|
+
+| CAC (Custo de Aquisição de Cliente) | < R$ 35,00 |
+
+| LTV (Lifetime Value) de advogado assinante | > R$ 1.200,00 |
+
+| Taxa de retenção mensal de advogados (planos pagos) | ≥ 85% |
+
+| Tráfego orgânico para blog | ≥ 40% do total de visitas |
+
+| Percentual de buscas que resultam em contato | ≥ 18% |
+
+---
+
+## 10. RISCOS & MITIGAÇÕES
+
+| Risco | Probabilidade | Impacto | Estratégia de Mitigação |
+
+|-------|---------------|---------|--------------------------|
+
+| **Baixa confiança inicial em avaliações** | Alta | Alto | Implementar moderação híbrida transparente (exibir "Avaliado por equipe de moderação"); mostrar estatísticas de moderação no rodapé |
+
+| **Dificuldade em verificar credenciais em escala** | Média | Alto | Parceria com OAB para API de validação (inicialmente usar raspagem ética + validação manual como fallback); começar com estados-piloto (SP, RJ, MG) |
+
+| **Baixa produção de conteúdo no blog** | Média | Médio | Incentivar via: créditos de destaque no perfil, acesso antecipado a funcionalidades, programa de "Advogado Autoridade" com benefícios |
+
+| **Concorrência de diretórios genéricos (Google, LinkedIn)** | Alta | Médio | Diferencial claro: foco em verificação jurídica específica, não apenas dados de contato; investir em conteúdo educacional de topo de funil |
+
+| **Resistência de advogados à mudança** | Média | Médio | Onboarding personalizado; demonstração clara de ROI (leads qualificados vs. anúncios genéricos); programa piloto com escritórios respeitados |
+
+---
+
+## 11. PRÓXIMOS PASSOS & PLANO DE LANÇAMENTO
+
+### 11.1 Fase de Preparação (Semanas 1-2)
+
+- [ ] Finalizar contrato com equipe de desenvolvimento (se aplicável)
+
+- [ ] Configurar repositório monorepo (frontend Next.js + backend Rails)
+
+- [ ] Implementar pipeline CI/CD básico (testes, linting, build)
+
+- [ ] Criar ambiente de staging com dados realistas (anonymizados)
+
+- [ ] Definir plano de mídia inicial (foco em SEO jurídico + LinkedIn Ads para advogados)
+
+### 11.2 Sprint 0: Infraestrutura Base (Semana 3)
+
+- [ ] Configurar autenticação Devise + JWT
+
+- [ ] Criar entidades core (User, Advogado, Especialidade, Avaliacao)
+
+- [ ] Implementar API básica de busca de advogados
+
+- [ ] Construir frontend: página de busca + lista de clay-cards
+
+- [ ] Integrar AS-EDS com ajustes de cor jurídica
+
+- [ ] Escrever primeiros testes unitários (model Advogado, component LawyerCard)
+
+### 11.3 Sprint 1: Funcionalidade Core de Confiança (Semanas 4-5)
+
+- [ ] Implementar sistema de moderação de avaliações (IA + humana)
+
+- [ ] Construir página de perfil do advogado com aba de avaliações
+
+- [ ] Criar formulário de envio de avaliação (cliente logado)
+
+- [ ] Implementar verificação básica de OAB (formato + consulta a serviço público simples)
+
+- [ ] Testes E2E do fluxo: busca → perfil → deixar avaliação → moderação
+
+### 11.4 Sprint 2: Blog & Monetização Inicial (Semanas 6-7)
+
+- [ ] Implementar entidade PostBlog + API de gerenciamento
+
+- [ ] Construir página de blog com busca por tag/autor
+
+- [ ] Criar interface no Active Admin para gerenciamento de banners
+
+- [ ] Implementar posições de banner (header/sidebar) com contagem de impressões
+
+- [ ] Lançamento beta fechado com 50 advogados convidados + 200 usuários de teste
+
+### 11.5 Lançamento Público (Semana 8)
+
+- [ ] Revisão final de segurança e acessibilidade
+
+- [ ] Campanha de relações jurídicas (contato com associações jovens de advogados)
+
+- [ ] Ativação de canals de aquisição pagos (LinkedIn, Google Search)
+
+- [ ] Monitoramento intensivo de métricas de aceitação (primeiras 2 semanas)
+
+- [ ] Plano de comunicação para primeiras 100 avaliações publicadas
+
+---
+
+## 12. APÊNDICES
+
+### 12.1 Glossário de Termos Jurídicos Relevantes
+
+- **OAB:** Ordem dos Advogados do Brasil (registro profissional obrigatório)
+
+- **Especialidade Área de Atuação:** Classificação CNJ (Conselho Nacional de Justiça) para áreas do direito
+
+- **Honorários Sucumbenciais:** Verba paga pela parte vencida em processo judicial ao advogado da parte vencedora
+
+- **Assessoria Jurídica Preventiva:** Consultoria para evitar litígios (contratos, compliance)
+
+### 12.2 Referências & Benchmarks
+
+- **Plataformas de referência:** Avvo (EUA), Lawyers.com, MiglioriAvvocati.it (Itália)
+
+- **Padrões de design jurídico:** Sites de escritórios top (Trench Rossi Werner, Pinheiro Neto)
+
+- **Métricas de confiança em serviços profissionais:** Estudos da McKinsey sobre "professional services marketplaces"
+
+### 12.3 Checklist de Pré-Lançamento
+
+- [ ] Todos os testes de unidade e integração passando em CI
+
+- [ ] Auditoría de acessibilidade concluída (WCAG 2.1 AA)
+
+- [ ] Testes de carga realizados (simulando 1000 usuários simultâneos)
+
+- [ ] Plano de resposta a incidentes documentado
+
+- [ ] Backup e recuperação de banco testados
+
+- [ ] Termos de uso e política de privacidade revisados por jurídico
+
+- [ ] Treinamento de suporte inicial concluído
+
+---
+
+> **PRD Gerado para Implementação em Lovable**  
+
+> Este documento contém todas as especificações necessárias para gerar o frontend no Lovable, com diretrizes claras para:  
+
+> 1. Reutilização inteligente do AS-EDS com adaptações para o setor jurídico  
+
+> 2. Estrutura de componentes pronta para geração via prompt  
+
+> 3. Pontos de integração com o backend Active Admin/Rails definidos  
+
+> 4. Abordagem de TDD especificada para validação contínua  
+
+>   
+
+> **Próximos passos sugeridos para você:**  
+
+> 1. Copie este conteúdo para `pdr-advogacia.md`  
+
+> 2. Revise e ajuste com sua equipe/stakeholders  
+
+> 3. Use este PRD como base para gerar prompts específicos no Lovable (ex: "Gere a página de busca de advogados com filtros usando clay-cards e AS-EDS adaptado")  
+
+> 4. Itere com o Lovable baseado nas especificações técnicas aqui descritas  
+
+*Este PRD é um documento vivo. Recomenda-se revisão a cada sprint baseado em aprendizados reais de usuários.*  
+
+**Versão 1.0 | Preparado paraexecução imediatamente após saída do Modo de Planejamento**
+
+```
+
+---
+
+## 📌 O QUE FAZER AGORA
+
+1. **Copie todo o conteúdo acima** (do início do markdown até o final)
+
+2. **Cole em um novo arquivo** chamado `pdr-advogacia.md` em seu editor de texto favorito (VS Code, Sublime, etc.) ou diretamente no Lovable se ele permitir importação de documentos de requisitos
+
+3. **Revise e adapte** conforme sua visão específica (este é um ponto de partida empreendedor)
+
+4. **Use este PRD como base** para:
+
+   - Guiar sua equipe de desenvolvimento (se tiver)
+
+   - Criar prompts específicos e focados para o Lovable (um por módulo: busca, perfil, blog, etc.)
+
+   - Alinhar expectativas com stakeholders técnicos e de produto
+
+### 💡 Dica para Prompts no Lovable
+
+Ao gerar componentes no Lovable, **refira-se diretamente às seções deste PRD**. Por exemplo:
+
+> *"Gere o componente LawyerCard baseado na seção 6.2 deste PRD-advogacia.md: deve exibir foto, nome, OAB com badge de verificação, especialidades como chips, faixa de honorários e avaliação média. Use as variações de clay-card do AS-EDS com ajustes de cor jurídica especificados na tabela de tokens."*
+
+Quando sair do **Modo de Planejamento**, você estará pronto para executar com um plano sólido, empreendedor e tecnicamente fundamentado.
+
