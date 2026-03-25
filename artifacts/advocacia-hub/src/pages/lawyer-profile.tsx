@@ -2,7 +2,7 @@ import { useParams } from "wouter";
 import { Layout } from "@/components/layout";
 import { useGetLawyer } from "@/hooks/use-lawyers";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Briefcase, GraduationCap, CheckCircle2, AlertCircle, Building2, Languages, Globe, Phone } from "lucide-react";
+import { MapPin, Briefcase, GraduationCap, CheckCircle2, AlertCircle, Building2, Languages, Globe, Phone, FileText } from "lucide-react";
 import { StarRating } from "@/components/star-rating";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { SpecialtyBadge } from "@/components/specialty-badge";
