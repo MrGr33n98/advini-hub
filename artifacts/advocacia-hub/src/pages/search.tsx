@@ -7,9 +7,10 @@ import { AdBanner, SidebarAdStack } from "@/components/ad-banner";
 import { useLawyerSearch } from "@/hooks/use-lawyers";
 import { useListSpecialties } from "@/hooks/use-specialties";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Filter, Star, ChevronLeft, ChevronRight, Scale } from "lucide-react";
+import { Filter, Star, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Pagination } from "@/components/pagination";
 import {
   Sheet,
   SheetContent,
@@ -188,30 +189,18 @@ export default function SearchPage() {
                   ))}
                 </div>
 
-                {/* Pagination */}
-                {data.totalPages > 1 && (
-                  <div className="flex justify-center items-center gap-2 mt-12">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setPage((params.page || 1) - 1)}
-                      disabled={(params.page || 1) === 1}
-                      className="rounded-xl"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm font-medium text-slate-600 px-4">
-                      Página {data.page} de {data.totalPages}
-                    </span>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setPage((params.page || 1) + 1)}
-                      disabled={(params.page || 1) === data.totalPages}
-                      className="rounded-xl"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
+                <Pagination
+                  currentPage={data.page}
+                  totalPages={data.totalPages}
+                  totalItems={data.total}
+                  itemsPerPage={params.limit ?? 12}
+                  onPageChange={(page) => {
+                    setPage(page);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  itemLabel="advogados"
+                  className="mt-10"
+                />
               </>
             ) : (
               <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 border-dashed">

@@ -9,6 +9,7 @@ import { SpecialtyBadge } from "@/components/specialty-badge";
 import { ContactForm } from "@/components/contact-form";
 import { ReviewCard } from "@/components/review-card";
 import { ReviewForm } from "@/components/review-form";
+import { Pagination } from "@/components/pagination";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,6 +20,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+
+const REVIEWS_PER_PAGE = 5;
 
 export default function LawyerProfile() {
   const { id } = useParams();
@@ -31,6 +34,7 @@ export default function LawyerProfile() {
   });
 
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewPage, setReviewPage] = useState(1);
 
   if (isLoading) {
     return (
@@ -175,7 +179,7 @@ export default function LawyerProfile() {
             </div>
 
             {/* Reviews Section */}
-            <div className="bg-white rounded-3xl p-8 shadow-clay-sm border border-slate-100">
+            <div id="reviews-section" className="bg-white rounded-3xl p-8 shadow-clay-sm border border-slate-100">
               <div className="flex justify-between items-center mb-8">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
@@ -207,13 +211,35 @@ export default function LawyerProfile() {
                 </Dialog>
               </div>
 
-              {lawyer.recentReviews && lawyer.recentReviews.length > 0 ? (
-                <div className="space-y-4">
-                  {lawyer.recentReviews.map(review => (
-                    <ReviewCard key={review.id} review={review} />
-                  ))}
-                </div>
-              ) : (
+              {lawyer.recentReviews && lawyer.recentReviews.length > 0 ? (() => {
+                const allReviews = lawyer.recentReviews;
+                const totalReviewPages = Math.ceil(allReviews.length / REVIEWS_PER_PAGE);
+                const pageReviews = allReviews.slice(
+                  (reviewPage - 1) * REVIEWS_PER_PAGE,
+                  reviewPage * REVIEWS_PER_PAGE
+                );
+                return (
+                  <>
+                    <div className="space-y-4">
+                      {pageReviews.map(review => (
+                        <ReviewCard key={review.id} review={review} />
+                      ))}
+                    </div>
+                    <Pagination
+                      currentPage={reviewPage}
+                      totalPages={totalReviewPages}
+                      totalItems={allReviews.length}
+                      itemsPerPage={REVIEWS_PER_PAGE}
+                      onPageChange={(page) => {
+                        setReviewPage(page);
+                        document.getElementById("reviews-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }}
+                      itemLabel="avaliações"
+                      className="mt-6"
+                    />
+                  </>
+                );
+              })() : (
                 <div className="text-center py-10 bg-slate-50 rounded-2xl border border-slate-100 border-dashed">
                   <p className="text-slate-500 mb-4">Este profissional ainda não possui avaliações visíveis.</p>
                   <Button variant="outline" onClick={() => setReviewDialogOpen(true)}>
