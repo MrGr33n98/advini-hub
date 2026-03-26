@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { Scale, Search, Menu, X, LogIn, UserPlus } from "lucide-react";
+import { Scale, Search, Menu, X, LogIn, UserPlus, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useFavorites } from "@/contexts/favorites-context";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -8,6 +9,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { count: favCount } = useFavorites();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -63,6 +65,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
               ))}
 
               <div className={`w-px h-5 ${isScrolled || !isHome ? "bg-border" : "bg-white/20"} mx-1`} />
+
+              <Link href="/favoritos" className="relative">
+                <button className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors border ${
+                  isScrolled || !isHome
+                    ? "bg-white border-border text-slate-500 hover:border-rose-200 hover:text-rose-500"
+                    : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                }`}>
+                  <Heart className={`w-4 h-4 ${favCount > 0 ? "fill-rose-500 text-rose-500" : ""}`} />
+                  {favCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {favCount > 9 ? "9+" : favCount}
+                    </span>
+                  )}
+                </button>
+              </Link>
 
               <Button asChild variant="ghost" size="sm" className={`rounded-full gap-1.5 ${isScrolled || !isHome ? "" : "text-white hover:text-white hover:bg-white/10"}`}>
                 <Link href="/login">
@@ -161,15 +178,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <li><Link href="/buscar" className="hover:text-white transition-colors">Buscar Advogados</Link></li>
                 <li><Link href="/categorias" className="hover:text-white transition-colors">Categorias</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition-colors">Blog e Artigos</Link></li>
+                <li><Link href="/favoritos" className="hover:text-white transition-colors">Meus Favoritos</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4 text-sm">Acesso</h4>
+              <h4 className="text-white font-semibold mb-4 text-sm">Ferramentas</h4>
               <ul className="space-y-3 text-sm">
+                <li><Link href="/calculadora" className="hover:text-white transition-colors">Calculadora de Honorários</Link></li>
+                <li><Link href="/comparar" className="hover:text-white transition-colors">Comparar Advogados</Link></li>
+                <li><Link href="/faq" className="hover:text-white transition-colors">Perguntas Frequentes</Link></li>
+                <li><Link href="/precos" className="hover:text-white transition-colors">Planos e Preços</Link></li>
                 <li><Link href="/cadastro" className="hover:text-white transition-colors">Criar conta grátis</Link></li>
-                <li><Link href="/login" className="hover:text-white transition-colors">Fazer login</Link></li>
-                <li><Link href="/cadastro?role=lawyer" className="hover:text-white transition-colors">Sou advogado</Link></li>
               </ul>
             </div>
           </div>

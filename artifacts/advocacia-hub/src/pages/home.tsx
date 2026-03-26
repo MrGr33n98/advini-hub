@@ -1,9 +1,10 @@
 import { Layout } from "@/components/layout";
 import { SearchBar } from "@/components/search-bar";
 import { LawyerCard } from "@/components/lawyer-card";
+import { Newsletter } from "@/components/newsletter";
 import { useListLawyers } from "@/hooks/use-lawyers";
 import { useListBlogPosts } from "@/hooks/use-blog";
-import { ShieldCheck, Scale, FileText, ArrowRight, Search } from "lucide-react";
+import { ShieldCheck, Scale, FileText, ArrowRight, Search, Calculator, HelpCircle, GitCompareArrows } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -192,6 +193,63 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* Quick Tools section */}
+      <section className="bg-slate-50 border-t border-slate-100 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-slate-900 mb-2">Ferramentas gratuitas</h2>
+            <p className="text-muted-foreground">Recursos para te ajudar antes e durante o processo jurídico</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              {
+                href: "/calculadora",
+                icon: <Calculator className="w-7 h-7" />,
+                color: "from-emerald-500 to-emerald-600",
+                bg: "bg-emerald-50",
+                title: "Calculadora de Honorários",
+                desc: "Estime o custo do seu processo com base na área e complexidade do caso.",
+              },
+              {
+                href: "/comparar",
+                icon: <GitCompareArrows className="w-7 h-7" />,
+                color: "from-primary to-primary/80",
+                bg: "bg-primary/5",
+                title: "Comparar Advogados",
+                desc: "Compare até 3 profissionais lado a lado por avaliação, preço e especialidade.",
+              },
+              {
+                href: "/faq",
+                icon: <HelpCircle className="w-7 h-7" />,
+                color: "from-violet-500 to-violet-600",
+                bg: "bg-violet-50",
+                title: "Perguntas Frequentes",
+                desc: "Tire suas dúvidas sobre a plataforma e sobre como funciona o processo jurídico.",
+              },
+            ].map(tool => (
+              <Link key={tool.href} href={tool.href}>
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  className="group bg-white rounded-3xl p-7 border border-border shadow-sm hover:shadow-md transition-all cursor-pointer h-full"
+                >
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tool.color} flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform shadow-sm`}>
+                    {tool.icon}
+                  </div>
+                  <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-primary transition-colors">{tool.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{tool.desc}</p>
+                  <div className="flex items-center gap-1.5 text-primary text-sm font-semibold mt-4 group-hover:gap-2.5 transition-all">
+                    Acessar <ArrowRight className="w-4 h-4" />
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <Newsletter />
     </Layout>
   );
 }
