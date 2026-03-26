@@ -1,0 +1,57 @@
+# docker-compose.ec2.yml
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./artifacts/advocacia-hub
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost:3001/api/v1
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend_rails
+      dockerfile: Dockerfile.prod
+    ports:
+      - "3001:3001"
+    environment:
+      - RAILS_ENV=production
+      - DATABASE_URL=postgresql://advocaciahub:${DB_PASSWORD}@db:5432/advocaciahub_production
+      - REDIS_URL=redis://redis:6379/0
+      - SMTP_ADDRESS=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: advocaciahub
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: advocaciahub_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend_rails/tmp/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  redis:
+    image: redis:6-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

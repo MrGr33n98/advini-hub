@@ -20,6 +20,7 @@ import CompararPage from "@/pages/comparar";
 import PrecosPage from "@/pages/precos";
 import CalculadoraPage from "@/pages/calculadora";
 import FaqPage from "@/pages/faq";
+import EscritoriosPage from "@/pages/escritorios";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/precos" component={PrecosPage} />
       <Route path="/calculadora" component={CalculadoraPage} />
       <Route path="/faq" component={FaqPage} />
+      <Route path="/escritorios" component={EscritoriosPage} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,0 +1,66 @@
+# ansible/roles/ec2-setup/tasks/main.yml
+---
+- name: Update system packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install essential packages
+  apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - redis-server
+      - nginx
+      - nodejs
+      - npm
+      - ruby-full
+      - build-essential
+      - libpq-dev
+      - imagemagick
+      - git
+      - curl
+      - wget
+      - vim
+      - htop
+      - fail2ban
+    state: present
+
+- name: Start and enable PostgreSQL
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Start and enable Redis
+  systemd:
+    name: redis-server
+    state: started
+    enabled: yes
+
+- name: Start and enable Nginx
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Start and enable Fail2Ban
+  systemd:
+    name: fail2ban
+    state: started
+    enabled: yes
+
+- name: Configure firewall
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - 22
+    - 80
+    - 443
+
+- name: Enable firewall
+  ufw:
+    state: enabled
+    policy: deny

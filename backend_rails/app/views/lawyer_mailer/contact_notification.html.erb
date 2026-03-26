@@ -1,0 +1,35 @@
+<!-- app/views/lawyer_mailer/contact_notification.html.erb -->
+<div class="container">
+  <div class="header">
+    <h1>AdvocaciaHub</h1>
+    <h2>Nova Mensagem Recebida</h2>
+  </div>
+  
+  <div class="content">
+    <p>Olá,</p>
+    
+    <p>Você recebeu uma nova mensagem através da plataforma AdvocaciaHub:</p>
+    
+    <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #3b82f6;">
+      <p><strong>De:</strong> <%= @contact_message.client_name %></p>
+      <p><strong>Email:</strong> <%= @contact_message.client_email %></p>
+      <% if @contact_message.client_phone.present? %>
+        <p><strong>Telefone:</strong> <%= @contact_message.client_phone %></p>
+      <% end %>
+      <p><strong>Categoria:</strong> <%= @contact_message.case_type %></p>
+      <p><strong>Mensagem:</strong></p>
+      <p style="font-style: italic; color: #4b5563;"><%= simple_format(@contact_message.message) %></p>
+    </div>
+    
+    <p>Acesse sua conta no painel administrativo para responder esta mensagem.</p>
+    
+    <p style="margin-top: 30px;">
+      <a href="<%= Rails.application.routes.url_helpers.admin_root_url %>" class="btn">Acessar Painel</a>
+    </p>
+  </div>
+  
+  <div class="footer">
+    <p>Esta é uma mensagem automática da plataforma AdvocaciaHub.</p>
+    <p>Não responda diretamente a este email.</p>
+  </div>
+</div>

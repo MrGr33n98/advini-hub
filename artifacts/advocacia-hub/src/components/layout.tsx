@@ -20,6 +20,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navLinks = [
     { href: "/buscar", label: "Encontrar Advogado" },
     { href: "/categorias", label: "Categorias" },
+    { href: "/escritorios", label: "Escritórios" },
     { href: "/blog", label: "Artigos e Dicas" },
   ];
 
@@ -177,6 +178,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <ul className="space-y-3 text-sm">
                 <li><Link href="/buscar" className="hover:text-white transition-colors">Buscar Advogados</Link></li>
                 <li><Link href="/categorias" className="hover:text-white transition-colors">Categorias</Link></li>
+                <li><Link href="/escritorios" className="hover:text-white transition-colors">Escritórios de Advocacia</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition-colors">Blog e Artigos</Link></li>
                 <li><Link href="/favoritos" className="hover:text-white transition-colors">Meus Favoritos</Link></li>
               </ul>

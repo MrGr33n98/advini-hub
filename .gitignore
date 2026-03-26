@@ -1,49 +1,96 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# .gitignore
+# See https://help.github.com/articles/keeping-files-out-of-git/ for more about ignoring files.
 
-# compiled output
-dist
-tmp
-out-tsc
-*.tsbuildinfo
-.expo
-.expo-shared
+# Dependencies
+node_modules/
+vendor/bundle
+.bundle
+vendor/cache
+.yarn-integrity
+.yarn/cache
+.yarn/build-state.gz
 
-# dependencies
-node_modules
+# Testing
+.rspec
+spec/reports/
+*.seed
+features/reports/
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Caching
+.ruby-gemset
+.ruby-version
+tmp/
+.rails
+public/system
+storage
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# Coverage
+coverage/
+*.lcov
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
+# Logs
+log/*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# System Files
+# Runtime
+pids
+*.pid
+*.seed
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# Database
+db/*.sqlite3
+db/*.sqlite3-journal
+*.db
 
-# Replit
-.cache/
-.local/
+# Secrets
+config/master.key
+config/credentials.yml.enc
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+out/
+
+# CI/CD
+.github/
+.circleci/
+.travis.yml
+jenkins/
+.drone.yml
+
+# Documentation
+docs/_build/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# IDE specific
+.vs/
+*.sublime-project
+*.sublime-workspace

@@ -1,0 +1,127 @@
+# ansible/playbooks/deploy-advocaciahub.yml
+---
+- name: Deploy AdvocaciaHub to EC2 instance
+  hosts: ec2_instances
+  become: yes
+  vars:
+    app_dir: /opt/advocaciahub
+    backend_dir: "{{ app_dir }}/backend"
+    frontend_dir: /var/www/html
+    db_name: advocaciahub_production
+    db_user: advocaciahub
+    rails_env: production
+
+  tasks:
+    - name: Update system packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install system dependencies
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - redis-server
+          - nginx
+          - nodejs
+          - npm
+          - ruby-full
+          - build-essential
+          - libpq-dev
+          - imagemagick
+        state: present
+
+    - name: Start and enable PostgreSQL
+      systemd:
+        name: postgresql
+        state: started
+        enabled: yes
+
+    - name: Start and enable Redis
+      systemd:
+        name: redis-server
+        state: started
+        enabled: yes
+
+    - name: Create database user
+      become_user: postgres
+      postgresql_user:
+        name: "{{ db_user }}"
+        password: "{{ vault_db_password }}"
+        state: present
+
+    - name: Create database
+      become_user: postgres
+      postgresql_db:
+        name: "{{ db_name }}"
+        owner: "{{ db_user }}"
+        state: present
+
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Copy backend application
+      copy:
+        src: ../../backend_rails/
+        dest: "{{ backend_dir }}"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+        remote_src: no
+
+    - name: Install Ruby gems
+      bundler:
+        executable: /usr/local/bin/bundle
+        gemfile: "{{ backend_dir }}/Gemfile"
+        state: present
+        chdir: "{{ backend_dir }}"
+
+    - name: Configure Nginx
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/default
+      notify: restart nginx
+
+    - name: Start and enable Nginx
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Create systemd service for Rails app
+      template:
+        src: advocaciahub.service.j2
+        dest: /etc/systemd/system/advocaciahub-backend.service
+      notify: restart rails app
+
+    - name: Start and enable Rails app
+      systemd:
+        name: advocaciahub-backend
+        state: started
+        enabled: yes
+
+    - name: Run database migrations
+      command: bundle exec rake db:migrate
+      args:
+        chdir: "{{ backend_dir }}"
+      environment:
+        RAILS_ENV: "{{ rails_env }}"
+        DATABASE_URL: "postgresql://{{ db_user }}:{{ vault_db_password }}@localhost/{{ db_name }}"
+        REDIS_URL: "redis://localhost:6379/0"
+
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+
+    - name: restart rails app
+      systemd:
+        name: advocaciahub-backend
+        state: restarted
