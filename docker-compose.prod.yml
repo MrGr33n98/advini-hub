@@ -1,0 +1,66 @@
+# docker-compose.prod.yml
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.prod
+    ports:
+      - "3000:80"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://18.223.122.46:3001
+      - NEXT_PUBLIC_API_BASE_URL=http://18.223.122.46:3001
+      - NEXT_PUBLIC_SITE_URL=http://18.223.122.46:3000
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - sincronia-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.prod
+    ports:
+      - "3001:3001"
+    environment:
+      - RAILS_ENV=production
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@sincronia-postgres:5432/sincronia_production
+      - REDIS_URL=redis://sincronia-redis:6379/1
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - JWT_SECRET=${JWT_SECRET}
+    restart: unless-stopped
+    depends_on:
+      - sincronia-postgres
+      - sincronia-redis
+    networks:
+      - sincronia-network
+
+  sincronia-postgres:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: sincronia_production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - sincronia-network
+
+  sincronia-redis:
+    image: redis:6-alpine
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - sincronia-network
+
+networks:
+  sincronia-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
