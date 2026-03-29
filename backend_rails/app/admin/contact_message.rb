@@ -1,5 +1,5 @@
 # Active Admin for Contact Messages
-ActiveAdmin.register ContactMessage do
+ActiveAdmin.register "ContactMessage" do
   permit_params :lawyer_id, :client_name, :client_email, :client_phone, :message, :case_type, :status
 
   index do

@@ -1,6 +1,6 @@
 # Active Admin Configuration for Offices
 
-ActiveAdmin.register Office do
+ActiveAdmin.register "Office" do
   permit_params :trade_name, :city, :state, :lawyer_count, :logo_url
 
   index do

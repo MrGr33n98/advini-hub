@@ -1,6 +1,6 @@
 # Active Admin for Lawyers
 
-ActiveAdmin.register Lawyer do
+ActiveAdmin.register "Lawyer" do
   permit_params :full_name, :oab_number, :oab_state, :city, :state, 
                 :bio, :years_experience, :hourly_rate_min, :hourly_rate_max,
                 :is_verified, :avg_rating, :total_reviews, :office_id,

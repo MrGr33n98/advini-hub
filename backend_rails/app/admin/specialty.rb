@@ -1,5 +1,5 @@
 # Active Admin Configuration for Specialties
-ActiveAdmin.register Specialty do
+ActiveAdmin.register "Specialty" do
   permit_params :name, :description, :parent_id, :slug
 
   index do

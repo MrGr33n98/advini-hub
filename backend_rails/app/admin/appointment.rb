@@ -1,6 +1,6 @@
 # Active Admin for Appointments
 
-ActiveAdmin.register Appointment do
+ActiveAdmin.register "Appointment" do
   permit_params :lawyer_id, :client_id, :office_id, :client_name, :client_email, 
                 :client_phone, :appointment_date, :notes, :service_type, 
                 :appointment_type, :status, :fee_amount, :meeting_link
