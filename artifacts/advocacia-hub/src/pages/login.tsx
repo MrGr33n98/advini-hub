@@ -1,6 +1,6 @@
 // pages/Login.tsx
 import { useState } from "react";
-import { Link, useLocation, Navigate } from "wouter";
+import { Link, useLocation, Redirect } from "wouter";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ export default function LoginPage() {
   const [, setLocation] = useLocation();
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Redirect to="/" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

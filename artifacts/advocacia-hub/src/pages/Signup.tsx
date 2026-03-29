@@ -1,6 +1,6 @@
 // pages/Signup.tsx
 import { useState } from "react";
-import { Link, useLocation, Navigate } from "wouter";
+import { Link, useLocation, Redirect } from "wouter";
 import { Eye, EyeOff, User, Mail, Lock, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ export default function SignupPage() {
   const [, setLocation] = useLocation();
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Redirect to="/" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
