@@ -43,6 +43,17 @@ jobs:
           NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
           EOF
 
+          # CREATE SWAP TO PREVENT OOM KILLER ON BUILD
+          if [ -z "$(swapon --show)" ]; then
+            echo "Creating 2GB swap file..."
+            sudo fallocate -l 2G /swapfile
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+            echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+            echo "Swap file created!"
+          fi
+          
           # Rebuild and restart containers
           # If docker-compose isn't on PATH, full path may be needed e.g. /usr/local/bin/docker-compose
           sudo docker compose -f docker-compose.prod.yml down --remove-orphans
