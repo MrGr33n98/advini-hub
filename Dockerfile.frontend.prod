@@ -15,7 +15,7 @@ COPY artifacts ./artifacts
 COPY lib ./lib
 
 # Install dependencies for the workspace
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Required by vite.config.ts at build time
 ENV PORT=3000
