@@ -1,5 +1,4 @@
-# Active Admin Configuration for Lawyers
-require Rails.root.join('app', 'models', 'lawyer.rb')
+# Active Admin for Lawyers
 
 ActiveAdmin.register Lawyer do
   permit_params :full_name, :oab_number, :oab_state, :city, :state, 
