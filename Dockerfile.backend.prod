@@ -15,7 +15,7 @@ RUN apt-get update -qq && apt-get install -y \
 WORKDIR /app
 
 # Copy Gemfile and install dependencies
-COPY backend_rails/Gemfile backend_rails/Gemfile.lock ./
+COPY backend_rails/Gemfile backend_rails/Gemfile.lock* ./
 RUN gem install bundler:2.2.3
 RUN bundle config set --local without 'development test' && \
     bundle install --jobs 4 --retry 3
