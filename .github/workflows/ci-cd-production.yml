@@ -1,0 +1,267 @@
+# .github/workflows/ci-cd-production.yml
+name: CI/CD Production Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  ECR_REPOSITORY_FRONTEND: advocaciahub-frontend
+  ECR_REPOSITORY_BACKEND: advocaciahub-backend
+  ECS_CLUSTER: advocaciahub-cluster
+  FRONTEND_TASK_DEFINITION: ecs-task-frontend.json
+  BACKEND_TASK_DEFINITION: ecs-task-backend.json
+  CONTAINER_NAME_FRONTEND: frontend-container
+  CONTAINER_NAME_BACKEND: backend-container
+
+permissions:
+  contents: read
+  id-token: write
+  packages: write
+
+jobs:
+  test:
+    name: Test Codebase
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+        ruby-version: [3.0]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: artifacts/advocacia-hub/package-lock.json
+
+    - name: Setup Ruby ${{ matrix.ruby-version }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true
+
+    - name: Install frontend dependencies
+      run: |
+        cd artifacts/advocacia-hub
+        npm ci
+
+    - name: Install backend dependencies
+      run: |
+        cd backend_rails
+        bundle install
+
+    - name: Run frontend tests
+      run: |
+        cd artifacts/advocacia-hub
+        npm run test:unit
+        npm run test:integration
+        npm run lint
+        npm run typecheck
+
+    - name: Run backend tests
+      run: |
+        cd backend_rails
+        bundle exec rspec
+      env:
+        RAILS_ENV: test
+
+    - name: Upload test coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      security-events: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:javascript"
+
+    - name: Run Secret Scanning
+      uses: trufflesecurity/truffleHog@v3
+      with:
+        path: ./
+        extra_args: --only-verified
+
+    - name: Run Dependency Scanning
+      uses: actions/dependency-review-action@v3
+
+    - name: Run Container Security Scan
+      run: |
+        # Placeholder for container security scanning
+        echo "Running container security scan..."
+        # In a real implementation, this would scan Docker images
+
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [test, security-scan]
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push frontend image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build frontend image
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG -f Dockerfile.frontend .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+
+    - name: Build and push backend image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build backend image
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG -f Dockerfile.backend .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
+
+    - name: Image digest
+      run: echo ${{ steps.build-and-push.outputs.digest }}
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push'
+    environment: staging
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Download task definition
+      run: |
+        aws ecs describe-task-definition --task-definition $BACKEND_TASK_DEFINITION --query taskDefinition > task-definition.json
+
+    - name: Fill in the new image ID in the task definition
+      id: backend_task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: ${{ env.CONTAINER_NAME_BACKEND }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
+
+    - name: Deploy backend to ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.backend_task-def.outputs.task-definition }}
+        service: backend-service-staging
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Deploy frontend to ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ env.FRONTEND_TASK_DEFINITION }}
+        service: frontend-service-staging
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Run staging smoke tests
+      run: |
+        # Placeholder for smoke tests
+        echo "Running smoke tests on staging..."
+        # In a real implementation, this would run tests against the staging environment
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Download task definition
+      run: |
+        aws ecs describe-task-definition --task-definition $BACKEND_TASK_DEFINITION --query taskDefinition > task-definition.json
+
+    - name: Fill in the new image ID in the task definition
+      id: backend_task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: ${{ env.CONTAINER_NAME_BACKEND }}
+        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_BACKEND }}:${{ github.sha }}
+
+    - name: Deploy backend to ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.backend_task-def.outputs.task-definition }}
+        service: backend-service-production
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Deploy frontend to ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ env.FRONTEND_TASK_DEFINITION }}
+        service: frontend-service-production
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Run production smoke tests
+      run: |
+        # Placeholder for smoke tests
+        echo "Running smoke tests on production..."
+        # In a real implementation, this would run tests against the production environment
+
+    - name: Slack Notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#deployments'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      if: always()

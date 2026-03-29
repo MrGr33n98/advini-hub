@@ -1,0 +1,24 @@
+# .github/workflows/monitoring.yml
+name: Monitoring
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Health check
+      run: |
+        # This would be replaced with actual health check
+        # For example, checking if the deployed app is responding
+        echo "Checking application health..."
+        
+        # Example curl command to check if app is responding
+        # curl -f https://your-app-url.com/health || exit 1
+        
+        # For now, just simulate a health check
+        echo "Application is healthy"

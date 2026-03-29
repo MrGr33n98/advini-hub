@@ -1,0 +1,96 @@
+# .github/workflows/test.yml
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: advocacia_hub_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0
+        bundler-cache: true
+
+    - name: Install PostgreSQL client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev
+
+    - name: Install dependencies
+      run: |
+        cd backend_rails
+        bundle install
+
+    - name: Setup database
+      run: |
+        cd backend_rails
+        bundle exec rake db:create
+        bundle exec rake db:schema:load
+      env:
+        RAILS_ENV: test
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/advocacia_hub_test
+
+    - name: Run backend tests
+      run: |
+        cd backend_rails
+        bundle exec rspec
+      env:
+        RAILS_ENV: test
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/advocacia_hub_test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: artifacts/advocacia-hub/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd artifacts/advocacia-hub
+        npm ci
+
+    - name: Run frontend tests
+      run: |
+        cd artifacts/advocacia-hub
+        npm run test:unit
+        npm run test:integration
+
+    - name: Run linting
+      run: |
+        cd artifacts/advocacia-hub
+        npm run lint
+
+    - name: Run type checking
+      run: |
+        cd artifacts/advocacia-hub
+        npm run typecheck

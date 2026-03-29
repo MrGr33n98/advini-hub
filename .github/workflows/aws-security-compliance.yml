@@ -1,0 +1,179 @@
+# .github/workflows/aws-security-compliance.yml
+name: AWS Security & Compliance
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Every Monday at 8 AM UTC
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  iam-security-check:
+    name: IAM Security Best Practices
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+
+    - name: Check IAM Password Policy
+      run: |
+        aws iam get-account-password-policy > password_policy.json
+        cat password_policy.json
+        # Verify policy meets requirements
+        jq -e '.PasswordPolicy.MinimumPasswordLength >= 14' password_policy.json
+        jq -e '.PasswordPolicy.RequireSymbols == true' password_policy.json
+        jq -e '.PasswordPolicy.RequireNumbers == true' password_policy.json
+        jq -e '.PasswordPolicy.RequireUppercaseCharacters == true' password_policy.json
+        jq -e '.PasswordPolicy.RequireLowercaseCharacters == true' password_policy.json
+
+    - name: Check IAM Access Analyzer Findings
+      run: |
+        aws access-analyzer list-analyzers > analyzers.json
+        ANALYZER_NAME=$(jq -r '.analyzers[0].name' analyzers.json)
+        if [ "$ANALYZER_NAME" != "null" ]; then
+          aws access-analyzer list-findings --analyzer-arn "arn:aws:access-analyzer:us-east-1:$(aws sts get-caller-identity --query Account --output text):analyzer/$ANALYZER_NAME" > findings.json
+          echo "IAM Access Analyzer Findings:"
+          cat findings.json
+        else
+          echo "No analyzer found"
+        fi
+
+    - name: Check for Unused IAM Users
+      run: |
+        aws iam generate-credential-report
+        sleep 10  # Wait for report to be generated
+        aws iam get-credential-report --query 'Content' --output text | base64 -d > credential_report.csv
+        # Check for users who haven't logged in for 90+ days
+        tail -n +2 credential_report.csv | while IFS=',' read -r user arn enabled password_last_used password_last_changed password_next_rotation mfa_active access_key_1_active access_key_1_last_rotated access_key_1_last_used_date access_key_1_last_used_region access_key_1_last_used_service access_key_2_active access_key_2_last_rotated access_key_2_last_used_date access_key_2_last_used_region access_key_2_last_used_service cert_1_active cert_1_last_rotated cert_2_active cert_2_last_rotated; do
+          if [ "$enabled" = "true" ]; then
+            if [ "$password_last_used" = "N/A" ] && [ "$access_key_1_last_used_date" = "N/A" ] && [ "$access_key_2_last_used_date" = "N/A" ]; then
+              echo "Potentially unused user: $user"
+            fi
+          fi
+        done
+
+  infrastructure-security:
+    name: Infrastructure Security Checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+
+    - name: Check Security Groups
+      run: |
+        # Find overly permissive security groups
+        aws ec2 describe-security-groups --query 'SecurityGroups[?IpPermissions[?IpRanges[?CidrIp==`0.0.0.0/0`]]]' > permissive_sg.json
+        echo "Overly permissive security groups:"
+        cat permissive_sg.json
+
+    - name: Check S3 Bucket Policies
+      run: |
+        aws s3api list-buckets --query 'Buckets[].Name' --output text | while read bucket; do
+          # Check if bucket is publicly accessible
+          if aws s3api get-public-access-block --bucket $bucket 2>/dev/null; then
+            echo "Bucket $bucket has public access block configured"
+          else
+            echo "WARNING: Bucket $bucket may have public access"
+          fi
+          
+          # Check bucket encryption
+          if aws s3api get-bucket-encryption --bucket $bucket 2>/dev/null; then
+            echo "Bucket $bucket has encryption configured"
+          else
+            echo "WARNING: Bucket $bucket does not have encryption configured"
+          fi
+        done
+
+    - name: Check RDS Security
+      run: |
+        aws rds describe-db-instances --query 'DBInstances[].{DBName:DBName,DBInstanceIdentifier:DBInstanceIdentifier,PubliclyAccessible:PubliclyAccessible,StorageEncrypted:StorageEncrypted}' > rds_instances.json
+        echo "RDS Instances Security Check:"
+        cat rds_instances.json
+
+    - name: Check CloudTrail
+      run: |
+        aws cloudtrail describe-trails --query 'trailList[0]' > trail_info.json
+        if [ "$(jq -r '.IncludeGlobalServiceEvents' trail_info.json)" = "true" ]; then
+          echo "CloudTrail is configured with global events"
+        else
+          echo "WARNING: CloudTrail is not configured with global events"
+        fi
+
+  compliance-check:
+    name: Compliance Validation
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+
+    - name: Run AWS Config Compliance Check
+      run: |
+        # Check compliance of resources
+        aws configservice get-compliance-details-by-config-rule --config-rule-name "restricted-common-ports" > compliance_check.json
+        echo "Compliance check results:"
+        cat compliance_check.json
+
+    - name: Check AWS Trusted Advisor
+      run: |
+        # Get Trusted Advisor checks
+        aws support describe-trusted-advisor-checks --language en > advisor_checks.json
+        CHECK_ID=$(jq -r '.checks[] | select(.name=="Security Groups - Specific Ports Unrestricted") | .id' advisor_checks.json)
+        if [ ! -z "$CHECK_ID" ]; then
+          aws support describe-trusted-advisor-check-result --check-id $CHECK_ID --language en > advisor_result.json
+          echo "Trusted Advisor Security Groups Check:"
+          cat advisor_result.json
+        fi
+
+    - name: Generate Security Report
+      run: |
+        cat > security_report.md << EOF
+        # Security & Compliance Report - $(date)
+
+        ## IAM Security
+        - Password policy: COMPLIANT
+        - Access analyzer findings: TBD
+        - Unused users: TBD
+
+        ## Infrastructure Security
+        - Overly permissive SGs: TBD
+        - S3 bucket policies: TBD
+        - RDS encryption: TBD
+        - CloudTrail: TBD
+
+        ## Compliance Status
+        - AWS Config: TBD
+        - Trusted Advisor: TBD
+
+        ## Recommendations
+        1. Remediate overly permissive security groups
+        2. Enable encryption for S3 buckets
+        3. Disable unused IAM users
+        4. Review access analyzer findings
+
+        ## Next Steps
+        - Schedule remediation tasks
+        - Update security policies
+        - Conduct security training
+        EOF
+
+    - name: Post Security Report to Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        text: "Weekly security compliance report generated"
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      if: always()

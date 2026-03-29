@@ -1,0 +1,71 @@
+# .github/workflows/security.yml
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM
+
+jobs:
+  security-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0
+        bundler-cache: true
+
+    - name: Run Brakeman security scan
+      run: |
+        cd backend_rails
+        gem install brakeman
+        brakeman -o brakeman_report.txt
+        cat brakeman_report.txt
+
+    - name: Run bundle-audit for vulnerabilities
+      run: |
+        cd backend_rails
+        gem install bundler-audit
+        bundle audit check --update
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-report-backend
+        path: backend_rails/brakeman_report.txt
+
+  security-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: artifacts/advocacia-hub/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd artifacts/advocacia-hub
+        npm ci
+
+    - name: Run npm audit
+      run: |
+        cd artifacts/advocacia-hub
+        npm audit --audit-level moderate
+
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --file=artifacts/advocacia-hub/package.json

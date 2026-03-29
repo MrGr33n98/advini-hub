@@ -1,0 +1,72 @@
+# .github/workflows/build.yml
+name: Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: artifacts/advocacia-hub/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd artifacts/advocacia-hub
+        npm ci
+
+    - name: Build frontend
+      run: |
+        cd artifacts/advocacia-hub
+        npm run build
+      env:
+        NODE_ENV: production
+        VITE_API_URL: ${{ secrets.API_URL }}
+
+    - name: Upload frontend build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-build
+        path: artifacts/advocacia-hub/dist/
+
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0
+        bundler-cache: true
+
+    - name: Install dependencies
+      run: |
+        cd backend_rails
+        bundle install
+
+    - name: Precompile assets
+      run: |
+        cd backend_rails
+        bundle exec rake assets:precompile
+      env:
+        RAILS_ENV: production
+        SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+
+    - name: Upload backend build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: backend-build
+        path: backend_rails/

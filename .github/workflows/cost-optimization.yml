@@ -1,0 +1,144 @@
+# .github/workflows/cost-optimization.yml
+name: Cost Optimization Checks
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 9 AM UTC
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  cost-analysis:
+    name: Analyze Infrastructure Costs
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+
+    - name: Run AWS Cost Explorer Analysis
+      run: |
+        # Get cost and usage data for the last 30 days
+        aws ce get-cost-and-usage \
+          --time-period Start=$(date -d "30 days ago" +%Y-%m-%d),End=$(date -d "now" +%Y-%m-%d) \
+          --granularity DAILY \
+          --metrics "UNBLENDED_COST" "BLENDED_COST" \
+          --group-by Type=DIMENSION,Key=SERVICE > cost_analysis.json
+
+        # Get forecast for next month
+        aws ce get-cost-forecast \
+          --time-period Start=$(date -d "now" +%Y-%m-%d),End=$(date -d "30 days" +%Y-%m-%d) \
+          --granularity DAILY \
+          --metric UNBLENDED_COST > cost_forecast.json
+
+        # Display summary
+        echo "Cost Analysis Summary:"
+        jq '.ResultsByTime | length' cost_analysis.json
+        jq '.Total' cost_analysis.json
+
+    - name: Check Resource Utilization
+      run: |
+        # Check EC2 instances utilization
+        aws ec2 describe-instances --filters Name=instance-state-name,Values=running > ec2_instances.json
+        echo "Running EC2 instances: $(jq '.Reservations[].Instances[] | select(.State.Name == "running") | .InstanceId' ec2_instances.json | wc -l)"
+
+        # Check ECS services
+        aws ecs list-services --cluster ${{ vars.ECS_CLUSTER }} > ecs_services.json
+        echo "ECS services: $(jq '.serviceArns | length' ecs_services.json)"
+
+    - name: Generate Cost Optimization Report
+      run: |
+        cat > cost_report.md << EOF
+        # Cost Optimization Report - $(date)
+
+        ## Current Month Spend
+        - Total: TBD
+        - Forecast: TBD
+
+        ## Resource Utilization
+        - EC2 Instances: TBD
+        - ECS Services: TBD
+        - RDS Instances: TBD
+        - S3 Storage: TBD
+
+        ## Recommendations
+        1. Right-size underutilized EC2 instances
+        2. Consider Reserved Instances for predictable workloads
+        3. Clean up unused EBS volumes
+        4. Optimize S3 storage classes
+
+        ## Savings Opportunities
+        - Potential monthly savings: TBD
+        - Estimated payback period: TBD
+        EOF
+
+    - name: Post Cost Report to Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        text: "Weekly cost optimization report generated"
+        attachments: |
+          [{
+            "title": "Cost Analysis Summary",
+            "fields": [
+              {
+                "title": "Current Month",
+                "value": "TBD",
+                "short": true
+              },
+              {
+                "title": "Forecast",
+                "value": "TBD",
+                "short": true
+              }
+            ]
+          }]
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      if: always()
+
+  resource-cleanup:
+    name: Cleanup Unused Resources
+    runs-on: ubuntu-latest
+    needs: cost-analysis
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+
+    - name: Cleanup Old ECR Images
+      run: |
+        # Get list of images older than 30 days
+        aws ecr describe-images --repository-name ${{ vars.ECR_REPOSITORY_FRONTEND }} --query 'imageDetails[?imagePushedAt<`'$(date -d "30 days ago" -u +%Y-%m-%dT%H:%M:%S)'`]' > old_images_frontend.json
+        aws ecr describe-images --repository-name ${{ vars.ECR_REPOSITORY_BACKEND }} --query 'imageDetails[?imagePushedAt<`'$(date -d "30 days ago" -u +%Y-%m-%dT%H:%M:%S)'`]' > old_images_backend.json
+
+        # Delete old images (keeping latest 5)
+        # Frontend
+        jq -r '.imageDetails | sort_by(.imagePushedAt) | .[:-5] | .[].imageDigest' old_images_frontend.json | while read digest; do
+          aws ecr batch-delete-image --repository-name ${{ vars.ECR_REPOSITORY_FRONTEND }} --image-ids imageDigest=$digest
+        done
+
+        # Backend
+        jq -r '.imageDetails | sort_by(.imagePushedAt) | .[:-5] | .[].imageDigest' old_images_backend.json | while read digest; do
+          aws ecr batch-delete-image --repository-name ${{ vars.ECR_REPOSITORY_BACKEND }} --image-ids imageDigest=$digest
+        done
+
+    - name: Cleanup Old EBS Volumes
+      run: |
+        # Find unattached EBS volumes older than 7 days
+        aws ec2 describe-volumes --filters Name=status,Values=available Name=create-time,Values=$(date -d "7 days ago" +%Y-%m-%d) --query 'Volumes[].VolumeId' --output text | while read volume_id; do
+          if [ ! -z "$volume_id" ]; then
+            echo "Deleting unattached volume: $volume_id"
+            aws ec2 delete-volume --volume-id $volume_id
+          fi
+        done
