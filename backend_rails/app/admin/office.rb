@@ -1,4 +1,6 @@
 # Active Admin Configuration for Offices
+require Rails.root.join('app', 'models', 'office.rb')
+
 ActiveAdmin.register Office do
   permit_params :trade_name, :city, :state, :lawyer_count, :logo_url
 
