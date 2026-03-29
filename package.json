@@ -18,8 +18,9 @@
   },
   "private": true,
   "devDependencies": {
-    "typescript": "~5.9.2",
+    "@rollup/rollup-win32-x64-msvc": "^4.60.0",
+    "concurrently": "^8.2.0",
     "prettier": "^3.8.1",
-    "concurrently": "^8.2.0"
+    "typescript": "~5.9.2"
   }
 }

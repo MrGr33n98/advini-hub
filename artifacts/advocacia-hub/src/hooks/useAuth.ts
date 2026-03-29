@@ -1,6 +1,6 @@
 // hooks/useAuth.ts
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import api from '@/lib/api';
 import { User } from '@/types';
 
@@ -19,7 +19,7 @@ interface RegisterData {
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -49,12 +49,12 @@ export const useAuth = () => {
 
       localStorage.setItem('token', token);
       setUser(user);
-      navigate('/');
+      setLocation('/');
       return { success: true };
     } catch (error: any) {
-      return { 
-        success: false, 
-        error: error.response?.data?.error || 'Login failed' 
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Login failed'
       };
     }
   };
@@ -62,7 +62,7 @@ export const useAuth = () => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    navigate('/login');
+    setLocation('/login');
   };
 
   const register = async (userData: RegisterData) => {
@@ -72,12 +72,12 @@ export const useAuth = () => {
 
       localStorage.setItem('token', token);
       setUser(user);
-      navigate('/');
+      setLocation('/');
       return { success: true };
     } catch (error: any) {
-      return { 
-        success: false, 
-        error: error.response?.data?.error || 'Registration failed' 
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Registration failed'
       };
     }
   };
