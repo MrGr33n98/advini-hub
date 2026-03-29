@@ -1,5 +1,5 @@
 # Dockerfile.backend.prod
-FROM ruby:3.0.0-slim
+FROM ruby:3.1.2-slim-bullseye
 
 # Install system dependencies
 RUN apt-get update -qq && apt-get install -y \
@@ -16,7 +16,7 @@ WORKDIR /app
 
 # Copy Gemfile and install dependencies
 COPY backend_rails/Gemfile backend_rails/Gemfile.lock* ./
-RUN gem install bundler:2.2.3
+RUN gem update --system && gem install bundler
 RUN bundle config set --local without 'development test' && \
     bundle install --jobs 4 --retry 3
 
