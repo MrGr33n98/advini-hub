@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  # Forçar carregamento de todas as classes (models) em produção 
+  # para o ActiveAdmin não dar NameError
+  Rails.application.eager_load! if Rails.env.production?
+
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
 
