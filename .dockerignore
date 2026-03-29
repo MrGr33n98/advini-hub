@@ -4,11 +4,8 @@
 **/.gitignore
 **/README.md
 **/Dockerfile*
-**/docker-compose.yml
-**/package*.json
 **/yarn.lock
-**/Gemfile*
-**/Rakefile
+
 **/config.ru
 **/.rbenv-vars
 **/tmp
