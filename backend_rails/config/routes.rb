@@ -1,4 +1,11 @@
-# Update the routes to include appointments
+# Forçar carregamento para ActiveAdmin em produção
+require_relative '../app/models/application_record'
+require_relative '../app/models/appointment'
+require_relative '../app/models/lawyer'
+require_relative '../app/models/office'
+require_relative '../app/models/specialty'
+require_relative '../app/models/contact_message'
+
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
