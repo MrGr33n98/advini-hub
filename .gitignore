@@ -3,6 +3,7 @@
 
 # Dependencies
 node_modules/
+.local/
 vendor/bundle
 .bundle
 vendor/cache
@@ -75,7 +76,6 @@ build/
 out/
 
 # CI/CD
-.github/
 .circleci/
 .travis.yml
 jenkins/
