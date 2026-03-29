@@ -1,5 +1,5 @@
 # Dockerfile.frontend.prod
-FROM node:18-slim AS build
+FROM node:20-slim AS build
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -7,7 +7,7 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 # Copy root workspace files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig*.json ./
 
 # Copy the workspace members needed for the frontend
 # We copy the entire artifacts and lib folders to be safe with workspace deps
