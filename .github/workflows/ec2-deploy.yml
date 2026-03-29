@@ -1,0 +1,52 @@
+# .github/workflows/ec2-deploy.yml
+name: Deploy to EC2 (Production)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH configuration
+      run: |
+        mkdir -p ~/.ssh/
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Copy files to EC2
+      run: |
+        # Use rsync to only copy necessary files, excluding node_modules, .git, etc.
+        rsync -avz --exclude 'node_modules' --exclude '.git' --exclude 'tmp' ./ ubuntu@${{ secrets.EC2_HOST }}:${{ secrets.EC2_REMOTE_DIR || '/home/ubuntu/couple-sync' }}
+
+    - name: Deploy via Docker Compose on EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd ${{ secrets.EC2_REMOTE_DIR || '/home/ubuntu/couple-sync' }}
+          
+          # Create or update .env file for Docker Compose
+          cat <<EOF > .env
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
+          NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+          EOF
+
+          # Rebuild and restart containers
+          # If docker-compose isn't on PATH, full path may be needed e.g. /usr/local/bin/docker-compose
+          sudo docker compose -f docker-compose.prod.yml down --remove-orphans
+          sudo docker compose -f docker-compose.prod.yml up -d --build
+          
+          # Rails migrations (handled by Docker CMD but good to ensure)
+          # sudo docker compose -f docker-compose.prod.yml exec -T backend bundle exec rake db:migrate
