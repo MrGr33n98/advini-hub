@@ -47,6 +47,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true
+        working-directory: backend_rails
 
     - name: Install frontend dependencies
       run: |

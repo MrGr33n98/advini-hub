@@ -33,6 +33,7 @@ jobs:
       with:
         ruby-version: 3.0
         bundler-cache: true
+        working-directory: backend_rails
 
     - name: Install PostgreSQL client
       run: |
