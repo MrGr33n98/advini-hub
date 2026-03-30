@@ -75,7 +75,7 @@ jobs:
         RAILS_ENV: test
 
     - name: Upload test coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage/lcov.info
         flags: unittests
@@ -104,7 +104,7 @@ jobs:
         extra_args: --only-verified
 
     - name: Run Dependency Scanning
-      uses: actions/dependency-review-action@v3
+      uses: actions/dependency-review-action@v4
 
     - name: Run Container Security Scan
       run: |

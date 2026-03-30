@@ -15,10 +15,10 @@ jobs:
     needs: [build-frontend]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Download frontend build artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: frontend-build
         path: dist/
@@ -40,7 +40,7 @@ jobs:
     needs: [build-backend]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup Heroku
       uses: akhileshns/heroku-deploy@v3.12.12
