@@ -1,8 +1,3 @@
-# Active Admin for Appointments
-
-# Forçar carregamento do modelo base e do modelo específico antes do registro
-require_dependency Rails.root.join('app', 'models', 'application_record').to_s
-require_dependency Rails.root.join('app', 'models', 'appointment').to_s
 
 ActiveAdmin.register "Appointment" do
   permit_params :lawyer_id, :client_id, :office_id, :client_name, :client_email, 
