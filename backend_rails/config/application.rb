@@ -20,5 +20,10 @@ module AdvocaciaHub
     # config.eager_load_paths << Rails.root.join("extras")
 
     # API-only or not depends on whether ActiveAdmin/views are used
+    config.api_only = false
+
+    # Forçar o carregamento de models e pastas críticas
+    config.eager_load_paths << Rails.root.join("app", "models")
+    config.autoload_paths << Rails.root.join("app", "models")
   end
 end

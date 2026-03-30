@@ -29,4 +29,5 @@ RUN RAILS_ENV=production bundle exec rake assets:precompile || echo "No assets t
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "bundle exec rake db:create db:migrate && bundle exec rails server -b 0.0.0.0 -p 3001"]
+# Use migration script and server start
+CMD ["sh", "-c", "bundle exec rake db:prepare && bundle exec rails server -b 0.0.0.0 -p 3001"]
