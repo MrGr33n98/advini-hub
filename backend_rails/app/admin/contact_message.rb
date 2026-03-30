@@ -1,4 +1,7 @@
 # Active Admin for Contact Messages
+# Forçar carregamento do modelo antes do registro
+require_dependency Rails.root.join('app', 'models', 'contact_message').to_s
+
 ActiveAdmin.register "ContactMessage" do
   permit_params :lawyer_id, :client_name, :client_email, :client_phone, :message, :case_type, :status
 

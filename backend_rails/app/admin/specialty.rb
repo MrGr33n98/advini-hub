@@ -1,4 +1,7 @@
 # Active Admin Configuration for Specialties
+# Forçar carregamento do modelo antes do registro
+require_dependency Rails.root.join('app', 'models', 'specialty').to_s
+
 ActiveAdmin.register "Specialty" do
   permit_params :name, :description, :parent_id, :slug
 

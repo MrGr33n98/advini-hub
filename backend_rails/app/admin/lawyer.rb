@@ -1,5 +1,8 @@
 # Active Admin for Lawyers
 
+# Forçar carregamento do modelo antes do registro
+require_dependency Rails.root.join('app', 'models', 'lawyer').to_s
+
 ActiveAdmin.register "Lawyer" do
   permit_params :full_name, :oab_number, :oab_state, :city, :state, 
                 :bio, :years_experience, :hourly_rate_min, :hourly_rate_max,

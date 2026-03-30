@@ -1,5 +1,8 @@
 # Active Admin Configuration for Offices
 
+# Forçar carregamento do modelo antes do registro
+require_dependency Rails.root.join('app', 'models', 'office').to_s
+
 ActiveAdmin.register "Office" do
   permit_params :trade_name, :city, :state, :lawyer_count, :logo_url
 
