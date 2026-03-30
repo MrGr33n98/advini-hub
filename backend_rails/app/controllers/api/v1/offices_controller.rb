@@ -2,24 +2,27 @@
 class Api::V1::OfficesController < ApplicationController
   def index
     @offices = Office.all
-    
+
     # Apply filters
     @offices = @offices.where(city: params[:city]) if params[:city].present?
     @offices = @offices.where(state: params[:state]) if params[:state].present?
-    
+
+    # Count total BEFORE pagination
+    total_count = @offices.count
+
     # Pagination
     page = (params[:page] || 1).to_i
     limit = (params[:limit] || 12).to_i
     offset = (page - 1) * limit
-    
+
     @offices = @offices.limit(limit).offset(offset)
-    
+
     render json: {
       data: @offices.map { |o| office_json(o) },
-      total: @offices.count,
+      total: total_count,
       page: page,
       limit: limit,
-      totalPages: (@offices.count.to_f / limit).ceil
+      totalPages: (total_count.to_f / limit).ceil
     }
   end
 

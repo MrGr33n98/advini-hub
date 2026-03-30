@@ -4,33 +4,36 @@ class Api::V1::LawyersController < ApplicationController
 
   def index
     @lawyers = Lawyer.includes(:specialties, :office).all
-    
+
     # Apply filters
     @lawyers = @lawyers.where(city: params[:city]) if params[:city].present?
     @lawyers = @lawyers.where(state: params[:state]) if params[:state].present?
     @lawyers = @lawyers.joins(:specialties).where(specialties: { name: params[:specialty] }) if params[:specialty].present?
-    
+
     if params[:min_rating].present?
       @lawyers = @lawyers.where('avg_rating >= ?', params[:min_rating].to_f)
     end
-    
+
     if params[:search].present?
       @lawyers = @lawyers.where("full_name ILIKE ?", "%#{params[:search]}%")
     end
-    
+
+    # Count total BEFORE pagination
+    total_count = @lawyers.count
+
     # Pagination
     page = (params[:page] || 1).to_i
     limit = (params[:limit] || 12).to_i
     offset = (page - 1) * limit
-    
+
     @lawyers = @lawyers.limit(limit).offset(offset)
-    
+
     render json: {
       data: @lawyers.map { |l| lawyer_json(l) },
-      total: @lawyers.count,
+      total: total_count,
       page: page,
       limit: limit,
-      totalPages: (@lawyers.count.to_f / limit).ceil
+      totalPages: (total_count.to_f / limit).ceil
     }
   end
 
