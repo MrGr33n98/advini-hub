@@ -6,7 +6,6 @@
 **/Dockerfile*
 **/yarn.lock
 
-**/config.ru
 **/.rbenv-vars
 **/tmp
 **/logs
