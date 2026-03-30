@@ -23,6 +23,9 @@ RUN bundle config set --local without 'development test' && \
 # Copy application code
 COPY backend_rails .
 
+# Create necessary directories for Puma and Rails
+RUN mkdir -p tmp/pids log
+
 # Ensure the database.yml matches ENV variables
 # Precompile assets if needed (activeadmin might need it)
 RUN RAILS_ENV=production bundle exec rake assets:precompile || echo "No assets to precompile"
