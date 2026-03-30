@@ -1,6 +1,7 @@
 # Active Admin for Lawyers
 
-# Forçar carregamento do modelo antes do registro
+# Forçar carregamento do modelo base e do modelo específico antes do registro
+require_dependency Rails.root.join('app', 'models', 'application_record').to_s
 require_dependency Rails.root.join('app', 'models', 'lawyer').to_s
 
 ActiveAdmin.register "Lawyer" do
