@@ -10,26 +10,40 @@ ActiveAdmin.register_page "Dashboard" do
       end
     end
 
-    # Recent stats
+    # Recent stats - guarded with rescue to prevent 500 errors from missing tables
     columns do
       column do
         panel "Estatísticas Gerais" do
           ul do
-            li "Total de Advogados: #{Lawyer.count}"
-            li "Total de Escritórios: #{Office.count}"
-            li "Total de Agendamentos: #{Appointment.count}"
-            li "Mensagens Pendentes: #{ContactMessage.unread.count}"
+            begin
+              li "Total de Advogados: #{Lawyer.count}" if ActiveRecord::Base.connection.table_exists?(:lawyers)
+              li "Total de Escritórios: #{Office.count}" if ActiveRecord::Base.connection.table_exists?(:offices)
+              li "Total de Agendamentos: #{Appointment.count}" if ActiveRecord::Base.connection.table_exists?(:appointments)
+              if ActiveRecord::Base.connection.table_exists?(:contact_messages)
+                li "Mensagens Pendentes: #{ContactMessage.unread.count}"
+              end
+            rescue => e
+              li "Erro ao carregar estatísticas: #{e.message}"
+            end
           end
         end
       end
 
       column do
         panel "Atividade Recente" do
-          table_for(ContactMessage.last(5) || []) do
-            column("Cliente") { |msg| msg.client_name }
-            column("Advogado") { |msg| msg.lawyer.full_name if msg.lawyer }
-            column("Status") { |msg| status_tag(msg.status) }
-            column("Data") { |msg| pretty_format(msg.created_at) }
+          if ActiveRecord::Base.connection.table_exists?(:contact_messages)
+            begin
+              table_for(ContactMessage.last(5) || []) do
+                column("Cliente") { |msg| msg.client_name }
+                column("Advogado") { |msg| msg.lawyer.full_name if msg.lawyer }
+                column("Status") { |msg| status_tag(msg.status) }
+                column("Data") { |msg| pretty_format(msg.created_at) }
+              end
+            rescue => e
+              para "Erro ao carregar mensagens: #{e.message}"
+            end
+          else
+            para "Tabela de mensagens ainda não criada. Execute as migrations."
           end
         end
       end
@@ -39,7 +53,6 @@ ActiveAdmin.register_page "Dashboard" do
     columns do
       column do
         panel "Agendamentos Semanais" do
-          # This would integrate with a charting library in a real implementation
           div do
             para "Gráfico de agendamentos das últimas semanas"
           end
@@ -48,12 +61,18 @@ ActiveAdmin.register_page "Dashboard" do
 
       column do
         panel "Especialidades Mais Populares" do
-          # Top specialties by number of lawyers
-          top_specialties = Specialty.joins(:lawyers).group(:id).order('COUNT(lawyers.id) DESC').limit(5)
-          
-          table_for(top_specialties) do
-            column("Especialidade") { |spec| spec.name }
-            column("Número de Advogados") { |spec| spec.lawyers.count }
+          if ActiveRecord::Base.connection.table_exists?(:specialties)
+            begin
+              top_specialties = Specialty.joins(:lawyers).group(:id).order('COUNT(lawyers.id) DESC').limit(5)
+              table_for(top_specialties) do
+                column("Especialidade") { |spec| spec.name }
+                column("Número de Advogados") { |spec| spec.lawyers.count }
+              end
+            rescue => e
+              para "Erro ao carregar especialidades: #{e.message}"
+            end
+          else
+            para "Nenhuma especialidade cadastrada ainda."
           end
         end
       end
