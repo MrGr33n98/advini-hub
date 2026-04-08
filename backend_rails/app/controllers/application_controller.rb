@@ -7,10 +7,9 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception, unless: -> { request.format.json? }
   
-  # Handle API errors
-  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
-  rescue_from ActiveRecord::RecordInvalid, with: :record_invalid
-  rescue_from StandardError, with: :internal_server_error
+  # Handle specific API errors (only for JSON requests)
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found, if: -> { request.format.json? }
+  rescue_from ActiveRecord::RecordInvalid, with: :record_invalid, if: -> { request.format.json? }
 
   private
 
@@ -23,10 +22,5 @@ class ApplicationController < ActionController::Base
       error: 'Validation failed', 
       messages: exception.record.errors.full_messages 
     }, status: :unprocessable_entity
-  end
-  
-  def internal_server_error(exception)
-    Rails.logger.error exception.backtrace.join("\n")
-    render json: { error: 'Internal server error' }, status: :internal_server_error
   end
 end
