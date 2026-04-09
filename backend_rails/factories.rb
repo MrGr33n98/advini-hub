@@ -22,6 +22,10 @@ FactoryBot.define do
     name { Faker::Hacker.adjective }
     description { Faker::Lorem.paragraph }
     slug { name.downcase.gsub(' ', '-') }
+    icon { %w[scales briefcase shield heart calculator home leaf building store book user-check globe credit-card lightbulb shopping-cart].sample }
+    color { ['#1e40af', '#dc2626', '#7c3aed', '#be123c', '#ea580c', '#0891b2', '#15803d', '#6b21a8', '#1e3a8a', '#4c0519', '#0d47a1', '#2c5aa0', '#1a5f3b', '#f59e0b', '#059669'].sample }
+    position { rand(1..20) }
+    is_active { true }
   end
 
   factory :lawyer do

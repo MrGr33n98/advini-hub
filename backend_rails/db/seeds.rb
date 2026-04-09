@@ -17,27 +17,31 @@ puts "✓ Created AdminUser: #{admin_user.email}"
 
 # 2. Create 15 legal specialties
 specialties_data = [
-  { name: 'Direito Civil', slug: 'direito-civil', description: 'Casos de direito civil e contratos' },
-  { name: 'Direito Trabalhista', slug: 'direito-trabalhista', description: 'Questões trabalhistas e direitos do trabalhador' },
-  { name: 'Direito Penal', slug: 'direito-penal', description: 'Defesa em processos criminais' },
-  { name: 'Direito de Família', slug: 'direito-familia', description: 'Divorcios, pensão alimentícia e guarda de menores' },
-  { name: 'Direito Tributário', slug: 'direito-tributario', description: 'Questões fiscais e impostos' },
-  { name: 'Direito Imobiliário', slug: 'direito-imobiliario', description: 'Compra, venda e aluguel de imóveis' },
-  { name: 'Direito Ambiental', slug: 'direito-ambiental', description: 'Legislação ambiental e sustentabilidade' },
-  { name: 'Direito Administrativo', slug: 'direito-administrativo', description: 'Direito administrativo e público' },
-  { name: 'Direito Comercial', slug: 'direito-comercial', description: 'Direito comercial e empresarial' },
-  { name: 'Direito Constitucional', slug: 'direito-constitucional', description: 'Questões constitucionais' },
-  { name: 'Direito Previdenciário', slug: 'direito-previdenciario', description: 'Benefícios previdenciários e INSS' },
-  { name: 'Direito Imigração', slug: 'direito-imigracao', description: 'Questões de imigração e naturalização' },
-  { name: 'Direito Financeiro', slug: 'direito-financeiro', description: 'Direito bancário e financeiro' },
-  { name: 'Direito Propriedade Intelectual', slug: 'direito-pi', description: 'Patentes, marcas e direitos autorais' },
-  { name: 'Direito Consumidor', slug: 'direito-consumidor', description: 'Proteção dos direitos do consumidor' }
+  { name: 'Direito Civil', slug: 'direito-civil', description: 'Casos de direito civil, contratos, propriedade e responsabilidade civil', icon: 'scales', color: '#1e40af', position: 1, is_active: true },
+  { name: 'Direito Trabalhista', slug: 'direito-trabalhista', description: 'Questões trabalhistas, direitos do trabalhador, CLT e demissões', icon: 'briefcase', color: '#dc2626', position: 2, is_active: true },
+  { name: 'Direito Penal', slug: 'direito-penal', description: 'Defesa em processos criminais, crimes e investigação', icon: 'shield', color: '#7c3aed', position: 3, is_active: true },
+  { name: 'Direito de Família', slug: 'direito-familia', description: 'Divorcios, pensão alimentícia, guarda de menores e casamento', icon: 'heart', color: '#be123c', position: 4, is_active: true },
+  { name: 'Direito Tributário', slug: 'direito-tributario', description: 'Questões fiscais, impostos e legislação tributária', icon: 'calculator', color: '#ea580c', position: 5, is_active: true },
+  { name: 'Direito Imobiliário', slug: 'direito-imobiliario', description: 'Compra, venda e aluguel de imóveis, contratos imobiliários', icon: 'home', color: '#0891b2', position: 6, is_active: true },
+  { name: 'Direito Ambiental', slug: 'direito-ambiental', description: 'Legislação ambiental, sustentabilidade e proteção do meio ambiente', icon: 'leaf', color: '#15803d', position: 7, is_active: true },
+  { name: 'Direito Administrativo', slug: 'direito-administrativo', description: 'Direito administrativo, direito público e regulamentações governamentais', icon: 'building', color: '#6b21a8', position: 8, is_active: true },
+  { name: 'Direito Comercial', slug: 'direito-comercial', description: 'Direito comercial, empresarial e transações comerciais', icon: 'store', color: '#1e3a8a', position: 9, is_active: true },
+  { name: 'Direito Constitucional', slug: 'direito-constitucional', description: 'Questões constitucionais, direitos fundamentais e habeas corpus', icon: 'book', color: '#4c0519', position: 10, is_active: true },
+  { name: 'Direito Previdenciário', slug: 'direito-previdenciario', description: 'Benefícios previdenciários, INSS e pensões', icon: 'user-check', color: '#0d47a1', position: 11, is_active: true },
+  { name: 'Direito Imigração', slug: 'direito-imigracao', description: 'Questões de imigração, naturalização e direitos de estrangeiros', icon: 'globe', color: '#2c5aa0', position: 12, is_active: true },
+  { name: 'Direito Financeiro', slug: 'direito-financeiro', description: 'Direito bancário, financeiro e operações de crédito', icon: 'credit-card', color: '#1a5f3b', position: 13, is_active: true },
+  { name: 'Direito Propriedade Intelectual', slug: 'direito-pi', description: 'Patentes, marcas, direitos autorais e propriedade intelectual', icon: 'lightbulb', color: '#f59e0b', position: 14, is_active: true },
+  { name: 'Direito Consumidor', slug: 'direito-consumidor', description: 'Proteção dos direitos do consumidor e defesa em relações de consumo', icon: 'shopping-cart', color: '#059669', position: 15, is_active: true }
 ]
 
 specialties = specialties_data.map do |spec_data|
   Specialty.find_or_create_by(slug: spec_data[:slug]) do |specialty|
     specialty.name = spec_data[:name]
     specialty.description = spec_data[:description]
+    specialty.icon = spec_data[:icon]
+    specialty.color = spec_data[:color]
+    specialty.position = spec_data[:position]
+    specialty.is_active = spec_data[:is_active]
   end
 end
 puts "✓ Created #{specialties.count} specialties"

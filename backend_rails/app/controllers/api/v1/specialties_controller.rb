@@ -32,6 +32,10 @@ class Api::V1::SpecialtiesController < ApplicationController
       name: specialty.name,
       description: specialty.description,
       slug: specialty.slug,
+      icon: specialty.icon,
+      color: specialty.color,
+      position: specialty.position,
+      is_active: specialty.is_active,
       has_children: specialty.children.exists?,
       child_count: specialty.children.count
     }
