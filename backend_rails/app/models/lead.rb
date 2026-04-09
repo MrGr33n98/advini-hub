@@ -64,7 +64,7 @@ class Lead < ApplicationRecord
   }
 
   enum status: {
-    new: 0,
+    pending: 0,
     contacted: 1,
     qualified: 2,
     proposal_sent: 3,
@@ -137,7 +137,7 @@ class Lead < ApplicationRecord
 
   def mark_as_contacted
     self.last_contacted_at = Time.current
-    self.status = :contacted if new?
+    self.status = :contacted if pending?
     save
   end
 
