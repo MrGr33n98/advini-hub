@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self)
 
   namespace :api do
+    # Mantém /api/v1/ para compatibilidade
     namespace :v1 do
       # Public resources
       resources :lawyers, only: [:index, :show]
@@ -56,6 +57,16 @@ Rails.application.routes.draw do
       get '/client/messages', to: 'client_dashboard#messages'
       get '/client/favorites', to: 'client_dashboard#favorites'
       get '/client/subscription', to: 'client_dashboard#subscription'
+    end
+
+    # Atalho para /api/ (sem v1) atende o frontend
+    scope module: :v1 do
+      resources :lawyers, only: [:index, :show]
+      resources :offices, only: [:index, :show]
+      resources :specialties, only: [:index, :show]
+      resources :contact_messages, only: [:index, :show, :create]
+      resources :appointments, except: [:new, :edit]
+      resources :banners, only: [:index, :show]
     end
   end
 
