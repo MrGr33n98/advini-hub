@@ -16,6 +16,14 @@ class Appointment < ApplicationRecord
   scope :by_lawyer, ->(lawyer_id) { where(lawyer_id: lawyer_id) }
   scope :by_status, ->(status) { where(status: status) }
 
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id client_name client_email appointment_date status service_type created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[lawyer client office]
+  end
+
   private
 
   def appointment_date_future

@@ -11,4 +11,12 @@ class Office < ApplicationRecord
     # Could be added as a field later
     nil
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id trade_name city state created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[lawyers appointments]
+  end
 end

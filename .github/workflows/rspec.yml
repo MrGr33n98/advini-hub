@@ -1,0 +1,51 @@
+name: RSpec Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: advocaciahub_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.1.2
+        bundler-cache: true
+
+    - name: Setup database
+      working-directory: ./backend_rails
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/advocaciahub_test
+      run: |
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+
+    - name: Run tests
+      working-directory: ./backend_rails
+      run: bundle exec rspec --format documentation
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./backend_rails/coverage/.resultset.json

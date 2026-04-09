@@ -18,6 +18,14 @@ class User < ApplicationRecord
     encode_token({ user_id: id })
   end
 
+  def self.ransackable_attributes(auth_object = nil)
+    %w[id email role created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[appointments lawyer_profile]
+  end
+
   private
 
   def encode_token(payload)
