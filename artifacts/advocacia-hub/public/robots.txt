@@ -1,5 +1,5 @@
-# robots.txt for AdvocaciaHub
-# https://advocaciahub.com.br/robots.txt
+# robots.txt for Advindex
+# https://advindex.com.br/robots.txt
 
 User-agent: *
 Allow: /
@@ -26,7 +26,7 @@ Disallow: /api/
 Disallow: /buscar?*
 
 # Sitemap location
-Sitemap: https://advocaciahub.com.br/sitemap.xml
+Sitemap: https://advindex.com.br/sitemap.xml
 
 # Crawl-delay for polite crawling (optional)
 Crawl-delay: 1

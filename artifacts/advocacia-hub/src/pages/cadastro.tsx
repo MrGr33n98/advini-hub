@@ -58,7 +58,7 @@ export default function CadastroPage() {
           <p className="text-muted-foreground mb-6">
             {role === "lawyer"
               ? "Seu perfil está em análise. Verificaremos seus dados da OAB e entraremos em contato em até 24h."
-              : "Bem-vindo à AdvocaciaHub! Sua conta foi criada. Verifique seu e-mail para ativar."}
+              : "Bem-vindo à Advindex! Sua conta foi criada. Verifique seu e-mail para ativar."}
           </p>
           <Link href="/">
             <Button className="rounded-xl px-8 shadow-clay-btn">Ir para o início</Button>

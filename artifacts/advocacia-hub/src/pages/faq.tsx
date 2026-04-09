@@ -73,7 +73,7 @@ const FAQS = [
         a: "Sim. Utilizamos criptografia SSL em todas as comunicações e seguimos as diretrizes da LGPD (Lei Geral de Proteção de Dados). Seus dados nunca são vendidos a terceiros."
       },
       {
-        q: "O AdvocaciaHub intermedia pagamentos entre cliente e advogado?",
+        q: "O Advindex intermedia pagamentos entre cliente e advogado?",
         a: "Não. A plataforma facilita o contato entre clientes e advogados, mas os honorários e pagamentos são acordados e realizados diretamente entre as partes."
       },
     ]

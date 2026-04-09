@@ -51,12 +51,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex justify-between items-center h-18 py-3">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-clay-sm group-hover:scale-105 transition-transform duration-300">
-                <Scale className="w-4 h-4 text-white" />
-              </div>
-              <span className={`font-display font-bold text-xl tracking-tight ${isScrolled || !isHome ? "text-foreground" : "text-white drop-shadow-md"}`}>
-                Advocacia<span className={isScrolled || !isHome ? "text-primary" : "text-amber-200 drop-shadow-md"}>Hub</span>
-              </span>
+              <img src="/images/advindex_logo.png" alt="Advindex Logo" className="h-9 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
             </Link>
 
             {/* Desktop Nav */}
@@ -232,10 +227,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8">
             <div className="col-span-1 md:col-span-2">
               <Link href="/" className="flex items-center gap-2.5 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <Scale className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-display font-bold text-xl text-white">AdvocaciaHub</span>
+                <img src="/images/advindex_logo.png" alt="Advindex Logo" className="h-8 w-auto object-contain" />
               </Link>
               <p className="text-slate-400 max-w-sm mb-5 leading-relaxed text-sm">
                 Conectando cidadãos e empresas aos melhores profissionais jurídicos do Brasil com transparência e segurança.
@@ -265,7 +257,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="border-t border-slate-800 mt-10 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
-            <p>© {new Date().getFullYear()} AdvocaciaHub. Todos os direitos reservados.</p>
+            <p>© {new Date().getFullYear()} Advindex. Todos os direitos reservados.</p>
             <div className="flex gap-6 mt-4 md:mt-0">
               <a href="#" className="hover:text-white">Termos de Uso</a>
               <a href="#" className="hover:text-white">Privacidade</a>

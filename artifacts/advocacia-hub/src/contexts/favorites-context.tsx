@@ -9,7 +9,7 @@ interface FavoritesContextType {
 
 const FavoritesContext = createContext<FavoritesContextType | null>(null);
 
-const STORAGE_KEY = "advocaciahub_favorites";
+const STORAGE_KEY = "advindex_favorites";
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<number[]>(() => {

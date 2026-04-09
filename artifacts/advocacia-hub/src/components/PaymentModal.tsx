@@ -168,7 +168,7 @@ export function PaymentModal({
           {paymentMethod === 'pix' && (
             <div className="text-center py-4">
               <div className="bg-gray-200 border-2 border-dashed rounded-xl w-32 h-32 mx-auto mb-4" />
-              <p className="text-sm text-gray-600">Chave PIX: advocaciahub@exemplo.com</p>
+              <p className="text-sm text-gray-600">Chave PIX: contato@advindex.com.br</p>
               <p className="text-xs text-gray-500 mt-2">Código copia e cola será gerado após confirmação</p>
             </div>
           )}

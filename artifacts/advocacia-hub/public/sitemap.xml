@@ -7,7 +7,7 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://advocaciahub.com.br/</loc>
+    <loc>https://advindex.com.br/</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -15,7 +15,7 @@
 
   <!-- Search Page -->
   <url>
-    <loc>https://advocaciahub.com.br/buscar</loc>
+    <loc>https://advindex.com.br/buscar</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -23,7 +23,7 @@
 
   <!-- Categories -->
   <url>
-    <loc>https://advocaciahub.com.br/categorias</loc>
+    <loc>https://advindex.com.br/categorias</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -31,7 +31,7 @@
 
   <!-- Law Offices -->
   <url>
-    <loc>https://advocaciahub.com.br/escritorios</loc>
+    <loc>https://advindex.com.br/escritorios</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -39,7 +39,7 @@
 
   <!-- Blog -->
   <url>
-    <loc>https://advocaciahub.com.br/blog</loc>
+    <loc>https://advindex.com.br/blog</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -47,7 +47,7 @@
 
   <!-- Pricing -->
   <url>
-    <loc>https://advocaciahub.com.br/precos</loc>
+    <loc>https://advindex.com.br/precos</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -55,7 +55,7 @@
 
   <!-- FAQ -->
   <url>
-    <loc>https://advocaciahub.com.br/faq</loc>
+    <loc>https://advindex.com.br/faq</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -63,7 +63,7 @@
 
   <!-- Fee Calculator -->
   <url>
-    <loc>https://advocaciahub.com.br/calculadora</loc>
+    <loc>https://advindex.com.br/calculadora</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -71,7 +71,7 @@
 
   <!-- Compare Lawyers -->
   <url>
-    <loc>https://advocaciahub.com.br/comparar</loc>
+    <loc>https://advindex.com.br/comparar</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -79,7 +79,7 @@
 
   <!-- Favorites -->
   <url>
-    <loc>https://advocaciahub.com.br/favoritos</loc>
+    <loc>https://advindex.com.br/favoritos</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -87,7 +87,7 @@
 
   <!-- Registration -->
   <url>
-    <loc>https://advocaciahub.com.br/cadastro</loc>
+    <loc>https://advindex.com.br/cadastro</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -95,7 +95,7 @@
 
   <!-- Login -->
   <url>
-    <loc>https://advocaciahub.com.br/login</loc>
+    <loc>https://advindex.com.br/login</loc>
     <lastmod>2026-04-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

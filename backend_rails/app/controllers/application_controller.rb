@@ -8,19 +8,21 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, unless: -> { request.format.json? }
   
   # Handle specific API errors (only for JSON requests)
-  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found, if: -> { request.format.json? }
-  rescue_from ActiveRecord::RecordInvalid, with: :record_invalid, if: -> { request.format.json? }
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from ActiveRecord::RecordInvalid, with: :record_invalid
 
   private
 
   def record_not_found
+    return unless request.format.json?
     render json: { error: 'Record not found' }, status: :not_found
   end
 
   def record_invalid(exception)
-    render json: { 
-      error: 'Validation failed', 
-      messages: exception.record.errors.full_messages 
+    return unless request.format.json?
+    render json: {
+      error: 'Validation failed',
+      messages: exception.record.errors.full_messages
     }, status: :unprocessable_entity
   end
 end

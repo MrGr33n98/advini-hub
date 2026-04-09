@@ -170,7 +170,7 @@ export default function PrecosPage() {
       {/* Features comparison banner */}
       <section className="bg-slate-50 border-y border-border py-14 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-2">Por que o AdvocaciaHub?</h2>
+          <h2 className="text-2xl font-bold mb-2">Por que o Advindex?</h2>
           <p className="text-muted-foreground mb-10">A plataforma jurídica de maior crescimento no Brasil</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
