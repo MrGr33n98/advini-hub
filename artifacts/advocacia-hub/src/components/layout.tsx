@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { Scale, Search, Menu, X, LogIn, UserPlus, Heart } from "lucide-react";
+import { Scale, Search, Menu, X, LogIn, UserPlus, Heart, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/contexts/favorites-context";
+import { useAuthContext } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -10,6 +11,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { count: favCount } = useFavorites();
+  const { isAuthenticated, user, logout } = useAuthContext();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -25,6 +27,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
   ];
 
   const isHome = location === "/";
+  const showDashboard = isAuthenticated && user;
+  const getDashboardLink = () => {
+    if (!user) return "/dashboard";
+    switch(user.role) {
+      case 'lawyer': return "/dashboard/lawyer";
+      case 'client': return "/dashboard/client";
+      case 'admin': return "/dashboard";
+      default: return "/dashboard";
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background selection:bg-primary/20">
@@ -65,6 +77,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
 
+              {showDashboard && (
+                <>
+                  <div className={`w-px h-5 ${isScrolled || !isHome ? "bg-border" : "bg-white/20"} mx-1`} />
+                  <Link
+                    href={getDashboardLink()}
+                    className={`flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary ${
+                      location.startsWith("/dashboard")
+                        ? "text-primary"
+                        : isScrolled || !isHome
+                        ? "text-muted-foreground"
+                        : "text-white drop-shadow-md hover:drop-shadow-lg"
+                    }`}
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                </>
+              )}
+
               <div className={`w-px h-5 ${isScrolled || !isHome ? "bg-border" : "bg-white/20"} mx-1`} />
 
               <Link href="/favoritos" className="relative">
@@ -82,19 +113,45 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </button>
               </Link>
 
-              <Button asChild variant="ghost" size="sm" className={`rounded-full gap-1.5 ${isScrolled || !isHome ? "" : "text-white drop-shadow-md hover:text-white hover:bg-white/15"}`}>
-                <Link href="/login">
-                  <LogIn className="w-4 h-4" />
-                  Entrar
-                </Link>
-              </Button>
+              {isAuthenticated && user ? (
+                <>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className={`text-sm font-medium ${isScrolled || !isHome ? "text-foreground" : "text-white"}`}>
+                        {user.first_name || user.email}
+                      </p>
+                      <p className={`text-xs ${isScrolled || !isHome ? "text-muted-foreground" : "text-white/70"}`}>
+                        {user.role === 'lawyer' ? 'Advogado' : user.role === 'admin' ? 'Administrador' : 'Cliente'}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={logout}
+                      className={`gap-1.5 ${isScrolled || !isHome ? "" : "text-white hover:text-white hover:bg-white/15"}`}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sair
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Button asChild variant="ghost" size="sm" className={`rounded-full gap-1.5 ${isScrolled || !isHome ? "" : "text-white drop-shadow-md hover:text-white hover:bg-white/15"}`}>
+                    <Link href="/login">
+                      <LogIn className="w-4 h-4" />
+                      Entrar
+                    </Link>
+                  </Button>
 
-              <Button asChild size="sm" className="rounded-full shadow-clay-btn bg-primary hover:bg-primary/90 text-white font-medium px-5 gap-1.5">
-                <Link href="/cadastro">
-                  <UserPlus className="w-4 h-4" />
-                  Cadastrar
-                </Link>
-              </Button>
+                  <Button asChild size="sm" className="rounded-full shadow-clay-btn bg-primary hover:bg-primary/90 text-white font-medium px-5 gap-1.5">
+                    <Link href="/cadastro">
+                      <UserPlus className="w-4 h-4" />
+                      Cadastrar
+                    </Link>
+                  </Button>
+                </>
+              )}
             </nav>
 
             {/* Mobile Menu Toggle */}
@@ -130,6 +187,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   {link.label}
                 </Link>
               ))}
+              {showDashboard && (
+                <Link
+                  href={getDashboardLink()}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-base font-medium p-4 rounded-xl flex items-center justify-center gap-2 ${
+                    location.startsWith("/dashboard") ? "bg-primary/10 text-primary" : "text-foreground"
+                  }`}
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  Dashboard
+                </Link>
+              )}
               <div className="mt-6 flex flex-col gap-3">
                 <Button asChild variant="outline" className="w-full h-12 rounded-xl text-base">
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>

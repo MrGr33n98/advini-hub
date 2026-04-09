@@ -1,10 +1,12 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { FavoritesProvider } from "@/contexts/favorites-context";
 import { CompareProvider } from "@/contexts/compare-context";
 import { CompareBar } from "@/components/compare-bar";
+import { AuthProvider, useAuthContext } from "@/contexts/AuthContext";
 import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/home";
@@ -21,6 +23,10 @@ import PrecosPage from "@/pages/precos";
 import CalculadoraPage from "@/pages/calculadora";
 import FaqPage from "@/pages/faq";
 import EscritoriosPage from "@/pages/escritorios";
+import Dashboard from "@/pages/Dashboard";
+import LawyerDashboard from "@/pages/LawyerDashboard";
+import OfficeDashboard from "@/pages/OfficeDashboard";
+import ClientDashboard from "@/pages/ClientDashboard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +38,54 @@ const queryClient = new QueryClient({
   },
 });
 
+// Protected Route Component
+function ProtectedRoute({ component: Component, roles }: { component: any; roles?: string[] }) {
+  const { isAuthenticated, user, loading } = useAuthContext();
+  const [, setLocation] = useLocation();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    setLocation("/login");
+    return null;
+  }
+
+  if (roles && user && !roles.includes(user.role)) {
+    setLocation("/");
+    return null;
+  }
+
+  return <Component />;
+}
+
+// Redirect if authenticated (for login/cadastro pages)
+function AuthRedirect({ component: Component }: { component: any }) {
+  const { isAuthenticated, loading } = useAuthContext();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      setLocation("/dashboard");
+    }
+  }, [isAuthenticated, loading]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? null : <Component />;
+}
+
 function Router() {
   return (
     <Switch>
@@ -41,14 +95,35 @@ function Router() {
       <Route path="/categorias" component={CategoriasPage} />
       <Route path="/blog" component={BlogList} />
       <Route path="/blog/:id" component={BlogPostPage} />
-      <Route path="/login" component={LoginPage} />
-      <Route path="/cadastro" component={CadastroPage} />
+      <Route path="/escritorios" component={EscritoriosPage} />
       <Route path="/favoritos" component={FavoritosPage} />
       <Route path="/comparar" component={CompararPage} />
       <Route path="/precos" component={PrecosPage} />
       <Route path="/calculadora" component={CalculadoraPage} />
       <Route path="/faq" component={FaqPage} />
-      <Route path="/escritorios" component={EscritoriosPage} />
+      
+      {/* Auth pages with redirect if already logged in */}
+      <Route path="/login">
+        {(params) => <AuthRedirect component={LoginPage} />}
+      </Route>
+      <Route path="/cadastro">
+        {(params) => <AuthRedirect component={CadastroPage} />}
+      </Route>
+      
+      {/* Protected routes */}
+      <Route path="/dashboard">
+        {(params) => <ProtectedRoute component={Dashboard} roles={["admin"]} />}
+      </Route>
+      <Route path="/dashboard/lawyer">
+        {(params) => <ProtectedRoute component={LawyerDashboard} roles={["lawyer", "admin"]} />}
+      </Route>
+      <Route path="/dashboard/office">
+        {(params) => <ProtectedRoute component={OfficeDashboard} roles={["lawyer", "admin"]} />}
+      </Route>
+      <Route path="/dashboard/client">
+        {(params) => <ProtectedRoute component={ClientDashboard} roles={["client"]} />}
+      </Route>
+      
       <Route component={NotFound} />
     </Switch>
   );
@@ -57,17 +132,19 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <FavoritesProvider>
-          <CompareProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Router />
-              <CompareBar />
-            </WouterRouter>
-            <Toaster />
-          </CompareProvider>
-        </FavoritesProvider>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <FavoritesProvider>
+            <CompareProvider>
+              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                <Router />
+                <CompareBar />
+              </WouterRouter>
+              <Toaster />
+            </CompareProvider>
+          </FavoritesProvider>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

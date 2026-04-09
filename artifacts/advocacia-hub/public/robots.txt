@@ -1,0 +1,32 @@
+# robots.txt for AdvocaciaHub
+# https://advocaciahub.com.br/robots.txt
+
+User-agent: *
+Allow: /
+
+# Allow all crawlers access to public pages
+Allow: /buscar
+Allow: /categorias
+Allow: /escritorios
+Allow: /blog
+Allow: /blog/*
+Allow: /advogado/*
+Allow: /precos
+Allow: /faq
+Allow: /calculadora
+
+# Block admin and private areas
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /login
+Disallow: /cadastro
+Disallow: /api/
+
+# Block search parameters for crawl efficiency
+Disallow: /buscar?*
+
+# Sitemap location
+Sitemap: https://advocaciahub.com.br/sitemap.xml
+
+# Crawl-delay for polite crawling (optional)
+Crawl-delay: 1

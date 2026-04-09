@@ -4,14 +4,16 @@ class Lawyer < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :contact_messages, dependent: :destroy
   has_many :appointments, dependent: :destroy
+  has_many :assigned_leads, class_name: 'Lead', foreign_key: 'assigned_lawyer_id', dependent: :nullify
+  has_many :authored_articles, class_name: 'Article', foreign_key: 'author_id', dependent: :nullify
   has_and_belongs_to_many :specialties, join_table: 'lawyer_specialties'
   belongs_to :user, optional: true  # Connect to User if this lawyer has an account
-  
+
   validates :full_name, :oab_number, :city, :state, presence: true
   validates :oab_number, uniqueness: true
-  
+
   has_one_attached :photo
-  
+
   # Virtual attribute for email lookup
   def email
     user&.email
@@ -22,6 +24,6 @@ class Lawyer < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[specialties office reviews appointments]
+    %w[specialties office reviews appointments assigned_leads user]
   end
 end
