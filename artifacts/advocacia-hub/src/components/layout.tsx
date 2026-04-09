@@ -32,7 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled || !isHome
             ? "bg-white/90 backdrop-blur-md border-b border-border/50 shadow-sm"
-            : "bg-transparent"
+            : "bg-black/20 backdrop-blur-sm border-b border-white/10"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,8 +42,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-clay-sm group-hover:scale-105 transition-transform duration-300">
                 <Scale className="w-4 h-4 text-white" />
               </div>
-              <span className={`font-display font-bold text-xl tracking-tight ${isScrolled || !isHome ? "text-foreground" : "text-white"}`}>
-                Advocacia<span className={isScrolled || !isHome ? "text-primary" : "text-white/70"}>Hub</span>
+              <span className={`font-display font-bold text-xl tracking-tight ${isScrolled || !isHome ? "text-foreground" : "text-white drop-shadow-md"}`}>
+                Advocacia<span className={isScrolled || !isHome ? "text-primary" : "text-amber-200 drop-shadow-md"}>Hub</span>
               </span>
             </Link>
 
@@ -58,7 +58,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                       ? "text-primary"
                       : isScrolled || !isHome
                       ? "text-muted-foreground"
-                      : "text-white/80"
+                      : "text-white drop-shadow-md hover:drop-shadow-lg"
                   }`}
                 >
                   {link.label}
@@ -71,7 +71,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <button className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors border ${
                   isScrolled || !isHome
                     ? "bg-white border-border text-slate-500 hover:border-rose-200 hover:text-rose-500"
-                    : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    : "bg-white/20 border-white/40 text-white drop-shadow-md hover:bg-white/30"
                 }`}>
                   <Heart className={`w-4 h-4 ${favCount > 0 ? "fill-rose-500 text-rose-500" : ""}`} />
                   {favCount > 0 && (
@@ -82,7 +82,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </button>
               </Link>
 
-              <Button asChild variant="ghost" size="sm" className={`rounded-full gap-1.5 ${isScrolled || !isHome ? "" : "text-white hover:text-white hover:bg-white/10"}`}>
+              <Button asChild variant="ghost" size="sm" className={`rounded-full gap-1.5 ${isScrolled || !isHome ? "" : "text-white drop-shadow-md hover:text-white hover:bg-white/15"}`}>
                 <Link href="/login">
                   <LogIn className="w-4 h-4" />
                   Entrar
@@ -99,7 +99,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Mobile Menu Toggle */}
             <button
-              className={`md:hidden p-2 ${isScrolled || !isHome ? "text-foreground" : "text-white"}`}
+              className={`md:hidden p-2 drop-shadow-md ${isScrolled || !isHome ? "text-foreground" : "text-white"}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X /> : <Menu />}
