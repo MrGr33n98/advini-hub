@@ -665,7 +665,7 @@ const generateMockArticles = (): Article[] => [
     excerpt: "Entenda as mudanças na legislação e como elas impactam as empresas brasileiras.",
     content: "Conteúdo completo do artigo...",
     cover_image_url: "https://example.com/image1.jpg",
-    meta_title: "Novas Regras para Reestruturação Societária em 2026 | AdvocaciaHub",
+    meta_title: "Novas Regras para Reestruturação Societária em 2026 | Advindex",
     meta_description: "Guia completo sobre as novas regras de reestruturação societária",
     meta_keywords: ["reestruturação", "societária", "2026", "empresarial"],
     category: "Direito Empresarial",
