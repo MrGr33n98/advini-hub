@@ -61,34 +61,6 @@ class CreateSaasTables < ActiveRecord::Migration[7.0]
     add_index :lead_activities, :occurred_at
 
     # ========================================
-    # SUBSCRIPTIONS TABLE (for Members)
-    # ========================================
-    create_table :subscriptions do |t|
-      t.references :user, null: false, foreign_key: true
-      t.references :plan, null: false, foreign_key: true
-      t.integer :status, default: 0, null: false # enum
-      t.datetime :current_period_start
-      t.datetime :current_period_end
-      t.boolean :cancel_at_period_end, default: false
-      t.datetime :canceled_at
-      t.datetime :trial_start
-      t.datetime :trial_end
-      t.decimal :amount, precision: 10, scale: 2
-      t.string :currency, default: 'BRL'
-      t.string :payment_method
-      t.datetime :last_payment_date
-      t.datetime :next_payment_date
-      t.string :stripe_subscription_id
-      t.string :stripe_customer_id
-
-      t.timestamps
-    end
-
-    add_index :subscriptions, :status
-    add_index :subscriptions, :current_period_end
-    add_index :subscriptions, :stripe_subscription_id, unique: true
-
-    # ========================================
     # PLANS TABLE
     # ========================================
     create_table :plans do |t|
@@ -121,6 +93,34 @@ class CreateSaasTables < ActiveRecord::Migration[7.0]
 
     add_index :plans, :is_active
     add_index :plans, :display_order
+
+    # ========================================
+    # SUBSCRIPTIONS TABLE (for Members)
+    # ========================================
+    create_table :subscriptions do |t|
+      t.references :user, null: false, foreign_key: true
+      t.references :plan, null: false, foreign_key: true
+      t.integer :status, default: 0, null: false # enum
+      t.datetime :current_period_start
+      t.datetime :current_period_end
+      t.boolean :cancel_at_period_end, default: false
+      t.datetime :canceled_at
+      t.datetime :trial_start
+      t.datetime :trial_end
+      t.decimal :amount, precision: 10, scale: 2
+      t.string :currency, default: 'BRL'
+      t.string :payment_method
+      t.datetime :last_payment_date
+      t.datetime :next_payment_date
+      t.string :stripe_subscription_id
+      t.string :stripe_customer_id
+
+      t.timestamps
+    end
+
+    add_index :subscriptions, :status
+    add_index :subscriptions, :current_period_end
+    add_index :subscriptions, :stripe_subscription_id, unique: true
 
     # ========================================
     # SPONSORED CAMPAIGNS TABLE
